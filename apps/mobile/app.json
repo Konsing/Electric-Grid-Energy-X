@@ -1,0 +1,22 @@
+{
+  "expo": {
+    "name": "Electric Grid Energy X",
+    "slug": "egx-mobile",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "scheme": "egx",
+    "userInterfaceStyle": "light",
+    "newArchEnabled": true,
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.egx.mobile"
+    },
+    "android": {
+      "package": "com.egx.mobile",
+      "adaptiveIcon": {
+        "backgroundColor": "#2563eb"
+      }
+    },
+    "plugins": ["expo-router", "expo-secure-store"]
+  }
+}
