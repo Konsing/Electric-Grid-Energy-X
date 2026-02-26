@@ -24,6 +24,16 @@ export function createApp() {
   app.use(express.json());
   app.use(metricsMiddleware);
 
+  // ─── Root ──────────────────────────────────────────
+  app.get('/', (_req, res) => {
+    res.json({
+      name: 'Electric Grid Energy X API',
+      version: '1.0.0',
+      health: '/api/health',
+      docs: '/api/metrics',
+    });
+  });
+
   // ─── Routes ─────────────────────────────────────────
   app.use('/api/health', healthRouter);
   app.use('/api/metrics', metricsRouter);
@@ -54,7 +64,7 @@ export function createApp() {
 // Start server unless in test mode
 if (!config.isTest) {
   const app = createApp();
-  app.listen(config.PORT, () => {
+  app.listen(config.PORT, '0.0.0.0', () => {
     console.log(`⚡ Electric Grid Energy X API running on port ${config.PORT}`);
     console.log(`   Environment: ${config.NODE_ENV}`);
     console.log(`   Mock Auth: ${config.MOCK_AUTH}`);

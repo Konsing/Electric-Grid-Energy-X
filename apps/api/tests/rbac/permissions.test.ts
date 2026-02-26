@@ -122,7 +122,7 @@ describe('GET /api/accounts/:id', () => {
 // PATCH /api/accounts/:id — ADMIN any, CUSTOMER self
 // ---------------------------------------------------------------------------
 describe('PATCH /api/accounts/:id', () => {
-  const updatePayload = { phone: '555-9999' };
+  const updatePayload = { phone: '555-999-9999' };
 
   it('allows ADMIN to update any account', async () => {
     const res = await request(app)
@@ -486,7 +486,7 @@ describe('POST /api/meters/:id/readings', () => {
     readingValue: 555,
     readingDate: new Date().toISOString(),
     source: 'MANUAL',
-    idempotencyKey: 'test-key-unique-001',
+    idempotencyKey: '00000000-0000-4000-a000-000000000001',
   };
 
   it('allows ADMIN to submit reading for any meter', async () => {
@@ -502,7 +502,7 @@ describe('POST /api/meters/:id/readings', () => {
     const res = await request(app)
       .post(`/api/meters/${fixtures.meter1Id}/readings`)
       .set('Authorization', `Bearer ${techToken}`)
-      .send({ ...readingPayload, idempotencyKey: 'test-key-unique-tech' });
+      .send({ ...readingPayload, idempotencyKey: '00000000-0000-4000-a000-000000000002' });
     expect(res.status).toBe(403);
   });
 
@@ -510,7 +510,7 @@ describe('POST /api/meters/:id/readings', () => {
     const res = await request(app)
       .post(`/api/meters/${fixtures.meter1Id}/readings`)
       .set('Authorization', `Bearer ${customerToken}`)
-      .send({ ...readingPayload, idempotencyKey: 'test-key-unique-cust' });
+      .send({ ...readingPayload, idempotencyKey: '00000000-0000-4000-a000-000000000003' });
     expect([200, 201]).toContain(res.status);
     expect(res.body.success).toBe(true);
   });
@@ -519,7 +519,7 @@ describe('POST /api/meters/:id/readings', () => {
     const res = await request(app)
       .post(`/api/meters/${fixtures.meter2Id}/readings`)
       .set('Authorization', `Bearer ${customerToken}`)
-      .send({ ...readingPayload, idempotencyKey: 'test-key-unique-cross' });
+      .send({ ...readingPayload, idempotencyKey: '00000000-0000-4000-a000-000000000004' });
     expect(res.status).toBe(403);
   });
 
@@ -655,7 +655,7 @@ describe('POST /api/outages', () => {
     title: 'Test Outage',
     description: 'Transformer failure in sector 7',
     affectedArea: 'Downtown District',
-    severity: 'MAJOR',
+    severity: 'HIGH',
     estimatedResolution: new Date(Date.now() + 3600000).toISOString(),
   };
 

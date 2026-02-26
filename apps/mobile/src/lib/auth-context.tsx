@@ -1,6 +1,12 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
-import * as SecureStore from 'expo-secure-store';
+import { Platform } from 'react-native';
 import { getMe } from './api';
+
+// Lazy-load SecureStore to avoid crashes if native module isn't ready
+let SecureStore: typeof import('expo-secure-store') | null = null;
+try {
+  SecureStore = require('expo-secure-store');
+} catch {}
 
 interface User {
   id: string;
@@ -23,6 +29,39 @@ interface AuthContextType {
   logout: () => void;
 }
 
+const TOKEN_KEY = 'egx_token';
+
+function getStoredToken(): string | null {
+  try {
+    if (Platform.OS === 'web') {
+      return typeof localStorage !== 'undefined' ? localStorage.getItem(TOKEN_KEY) : null;
+    }
+    return SecureStore?.getItem?.(TOKEN_KEY) ?? null;
+  } catch {
+    return null;
+  }
+}
+
+function storeToken(token: string): void {
+  try {
+    if (Platform.OS === 'web') {
+      localStorage.setItem(TOKEN_KEY, token);
+    } else {
+      SecureStore?.setItem?.(TOKEN_KEY, token);
+    }
+  } catch {}
+}
+
+function removeToken(): void {
+  try {
+    if (Platform.OS === 'web') {
+      localStorage.removeItem(TOKEN_KEY);
+    } else {
+      SecureStore?.deleteItem?.(TOKEN_KEY);
+    }
+  } catch {}
+}
+
 const AuthContext = createContext<AuthContextType>({
   user: null,
   token: null,
@@ -37,30 +76,41 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    (async () => {
+    let cancelled = false;
+
+    const timer = setTimeout(async () => {
       try {
-        const stored = await SecureStore.getItemAsync('egx_token');
+        const stored = getStoredToken();
         if (stored) {
           const res = await getMe(stored);
-          setToken(stored);
-          setUser(res.data);
+          if (!cancelled) {
+            setToken(stored);
+            setUser(res.data);
+          }
         }
       } catch {
-        await SecureStore.deleteItemAsync('egx_token');
+        try { removeToken(); } catch {}
       } finally {
-        setIsLoading(false);
+        if (!cancelled) {
+          setIsLoading(false);
+        }
       }
-    })();
+    }, 0);
+
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+    };
   }, []);
 
-  const setAuth = useCallback(async (newToken: string, newUser: User) => {
-    await SecureStore.setItemAsync('egx_token', newToken);
+  const setAuth = useCallback((newToken: string, newUser: User) => {
+    storeToken(newToken);
     setToken(newToken);
     setUser(newUser);
   }, []);
 
-  const logout = useCallback(async () => {
-    await SecureStore.deleteItemAsync('egx_token');
+  const logout = useCallback(() => {
+    removeToken();
     setToken(null);
     setUser(null);
   }, []);

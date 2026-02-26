@@ -1,6 +1,7 @@
 import jwt from 'jsonwebtoken';
+import { config } from '../../src/lib/config';
 
-const JWT_SECRET = 'test-secret-key-at-least-32-characters-long!!';
+const JWT_SECRET = config.JWT_SECRET;
 
 /**
  * Generate a test JWT token for a given user.

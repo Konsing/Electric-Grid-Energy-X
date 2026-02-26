@@ -22,7 +22,7 @@ export default function AuthenticatedLayout({
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <p className="text-gray-500">Loading...</p>
+        <p className="text-gray-500 dark:text-slate-400">Loading...</p>
       </div>
     );
   }

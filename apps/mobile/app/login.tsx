@@ -1,7 +1,9 @@
 import { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, ScrollView } from 'react-native';
 import { useRouter } from 'expo-router';
+import { Feather } from '@expo/vector-icons';
 import { useAuth } from '../src/lib/auth-context';
+import { useTheme } from '../src/lib/theme-context';
 import { login, devLogin } from '../src/lib/api';
 
 export default function LoginScreen() {
@@ -9,6 +11,7 @@ export default function LoginScreen() {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const { setAuth } = useAuth();
+  const { colors, isDark, toggleTheme } = useTheme();
   const router = useRouter();
 
   const handleLogin = async () => {
@@ -38,33 +41,39 @@ export default function LoginScreen() {
   };
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.title}>Electric Grid Energy X</Text>
-      <Text style={styles.subtitle}>Sign in to your account</Text>
+    <ScrollView contentContainerStyle={[styles.container, { backgroundColor: colors.background }]}>
+      <TouchableOpacity onPress={toggleTheme} style={styles.themeToggle}>
+        <Feather name={isDark ? 'sun' : 'moon'} size={22} color={colors.text} />
+      </TouchableOpacity>
+
+      <Text style={[styles.title, { color: colors.brand }]}>Electric Grid Energy X</Text>
+      <Text style={[styles.subtitle, { color: colors.textSecondary }]}>Sign in to your account</Text>
 
       <View style={styles.form}>
         <TextInput
-          style={styles.input}
+          style={[styles.input, { backgroundColor: colors.inputBg, borderColor: colors.inputBorder, color: colors.text }]}
           placeholder="Email"
+          placeholderTextColor={colors.textTertiary}
           value={email}
           onChangeText={setEmail}
           autoCapitalize="none"
           keyboardType="email-address"
         />
         <TextInput
-          style={styles.input}
+          style={[styles.input, { backgroundColor: colors.inputBg, borderColor: colors.inputBorder, color: colors.text }]}
           placeholder="Password"
+          placeholderTextColor={colors.textTertiary}
           value={password}
           onChangeText={setPassword}
           secureTextEntry
         />
-        <TouchableOpacity style={styles.button} onPress={handleLogin} disabled={loading}>
+        <TouchableOpacity style={[styles.button, { backgroundColor: colors.brand }]} onPress={handleLogin} disabled={loading}>
           <Text style={styles.buttonText}>{loading ? 'Signing in...' : 'Sign In'}</Text>
         </TouchableOpacity>
       </View>
 
-      <View style={styles.devSection}>
-        <Text style={styles.devTitle}>Dev Quick Login</Text>
+      <View style={[styles.devSection, { backgroundColor: colors.devSectionBg, borderColor: colors.devSectionBorder }]}>
+        <Text style={[styles.devTitle, { color: colors.devTitle }]}>Dev Quick Login</Text>
         <View style={styles.devButtons}>
           {[
             { email: 'admin@egx.dev', label: 'Admin' },
@@ -73,11 +82,11 @@ export default function LoginScreen() {
           ].map((u) => (
             <TouchableOpacity
               key={u.email}
-              style={styles.devButton}
+              style={[styles.devButton, { borderColor: colors.devButtonBorder }]}
               onPress={() => handleDevLogin(u.email)}
               disabled={loading}
             >
-              <Text style={styles.devButtonText}>{u.label}</Text>
+              <Text style={[styles.devButtonText, { color: colors.devButtonText }]}>{u.label}</Text>
             </TouchableOpacity>
           ))}
         </View>
@@ -87,26 +96,27 @@ export default function LoginScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flexGrow: 1, justifyContent: 'center', padding: 24, backgroundColor: '#f9fafb' },
-  title: { fontSize: 28, fontWeight: 'bold', color: '#2563eb', textAlign: 'center' },
-  subtitle: { fontSize: 16, color: '#6b7280', textAlign: 'center', marginTop: 8, marginBottom: 32 },
+  container: { flexGrow: 1, justifyContent: 'center', padding: 24 },
+  themeToggle: { position: 'absolute', top: 56, right: 24 },
+  title: { fontSize: 28, fontWeight: 'bold', textAlign: 'center' },
+  subtitle: { fontSize: 16, textAlign: 'center', marginTop: 8, marginBottom: 32 },
   form: { gap: 12 },
   input: {
-    backgroundColor: '#fff', borderWidth: 1, borderColor: '#d1d5db', borderRadius: 12,
+    borderWidth: 1, borderRadius: 12,
     padding: 14, fontSize: 16,
   },
   button: {
-    backgroundColor: '#2563eb', borderRadius: 12, padding: 16, alignItems: 'center', marginTop: 8,
+    borderRadius: 12, padding: 16, alignItems: 'center', marginTop: 8,
   },
   buttonText: { color: '#fff', fontSize: 16, fontWeight: '600' },
   devSection: {
-    marginTop: 32, backgroundColor: '#fefce8', borderWidth: 1, borderColor: '#fde68a',
+    marginTop: 32, borderWidth: 1,
     borderRadius: 12, padding: 16,
   },
-  devTitle: { fontSize: 14, fontWeight: '600', color: '#92400e', marginBottom: 12 },
+  devTitle: { fontSize: 14, fontWeight: '600', marginBottom: 12 },
   devButtons: { flexDirection: 'row', gap: 8 },
   devButton: {
-    flex: 1, borderWidth: 1, borderColor: '#fde68a', borderRadius: 8, padding: 10, alignItems: 'center',
+    flex: 1, borderWidth: 1, borderRadius: 8, padding: 10, alignItems: 'center',
   },
-  devButtonText: { fontSize: 12, fontWeight: '500', color: '#92400e' },
+  devButtonText: { fontSize: 12, fontWeight: '500' },
 });

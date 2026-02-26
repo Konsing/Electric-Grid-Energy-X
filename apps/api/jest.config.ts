@@ -10,7 +10,7 @@ const config: Config = {
       tsconfig: 'tsconfig.test.json',
     }],
   },
-  setupFilesAfterSetup: ['<rootDir>/tests/jest.setup.ts'],
+  setupFilesAfterEnv: ['<rootDir>/tests/jest.setup.ts'],
   moduleNameMapper: {
     '^@egx/shared$': '<rootDir>/../../packages/shared/src',
   },
