@@ -2,6 +2,32 @@
 
 Full-stack portfolio project for a fictional regional electricity provider. Demonstrates senior-level engineering across a TypeScript monorepo: production-pattern RESTful API, responsive web portal, cross-platform mobile app, and shared code infrastructure.
 
+## Web App
+
+![Admin Manage Accounts Panel](docs/screenshots/web-1.png)
+*Admin — Manage Accounts Panel*
+
+![Customer Dashboard](docs/screenshots/web-2.png)
+*Customer — Dashboard*
+
+## Mobile App
+
+<p align="center">
+  <img src="docs/screenshots/mobile-1.png" alt="Mobile Admin Accounts Tab" width="30%" />
+  <img src="docs/screenshots/mobile-2.png" alt="Mobile Customer Account Info" width="30%" />
+</p>
+
+## Live Demo
+
+| Platform | URL | Hosting |
+|----------|-----|---------|
+| **Web App** | [egx-web.vercel.app](https://electric-grid-energy-x-web.vercel.app/) | Vercel (Free) |
+| **API** | [egx-api.onrender.com](https://egx-api.onrender.com) | Render (Free) |
+| **Database** | Managed PostgreSQL | Neon (Free) |
+| **Mobile App** | Available on Expo Go | Expo (Free) |
+
+> **Note:** The Render free tier spins down after inactivity. The first request may take ~30 seconds to cold-start.
+
 ## Architecture
 
 ```
@@ -9,13 +35,29 @@ electric-grid-energy-x/
 ├── apps/
 │   ├── api/          Express + TypeScript + Prisma (38 endpoints, 9 models)
 │   ├── web/          Next.js 14 App Router + Tailwind
-│   └── mobile/       Expo + React Native
+│   └── mobile/       Expo + React Native (Expo Router)
 ├── packages/
 │   ├── shared/       Types, validators, error codes, utils
 │   ├── ui/           Tailwind component library
 │   └── tsconfig/     Shared TypeScript configs
 └── scripts/
     └── benchmark.ts  Reproducible performance proof
+```
+
+### Deployment Architecture
+
+```
+┌─────────────┐     ┌──────────────┐     ┌──────────────┐
+│   Vercel     │────▶│    Render     │────▶│     Neon      │
+│  (Next.js)   │     │  (Express)   │     │ (PostgreSQL)  │
+│   Web App    │     │     API      │     │   Database    │
+└─────────────┘     └──────────────┘     └──────────────┘
+                           ▲
+┌─────────────┐            │
+│   Expo Go    │────────────┘
+│ (React Native)
+│  Mobile App  │
+└─────────────┘
 ```
 
 ## Key Engineering Decisions
@@ -42,6 +84,8 @@ pnpm install
 
 # 2. Set up environment
 cp apps/api/.env.example apps/api/.env
+cp apps/web/.env.example apps/web/.env
+cp apps/mobile/.env.example apps/mobile/.env
 # Edit DATABASE_URL if needed — defaults work with local PostgreSQL
 
 # 3. Database setup
@@ -61,6 +105,109 @@ curl -X POST http://localhost:3001/api/auth/dev-login \
   -H "Content-Type: application/json" \
   -d '{"email":"admin@egx.dev"}'
 # → { "success": true, "data": { "token": "eyJ..." } }
+```
+
+## Local Development
+
+Run these commands from the project root. Each app needs its own terminal.
+
+### API (Express + Prisma)
+
+```bash
+pnpm --filter api dev
+# Runs on http://localhost:3001
+```
+
+### Web App (Next.js)
+
+```bash
+pnpm --filter web dev
+# Runs on http://localhost:3000
+```
+
+### Mobile App (Expo)
+
+```bash
+cd apps/mobile
+pnpm exec expo start --tunnel --go --clear
+# Scan the QR code with Expo Go on your phone
+```
+
+> **`--tunnel`** routes through ngrok so your phone can reach the dev server even on different networks.
+> **`--go`** opens in Expo Go automatically. **`--clear`** resets the Metro bundler cache.
+
+### Environment Variables
+
+| App | File | Key Variable |
+|-----|------|-------------|
+| API | `apps/api/.env` | `DATABASE_URL`, `JWT_SECRET`, `MOCK_AUTH` |
+| Web | `apps/web/.env` | `NEXT_PUBLIC_API_URL` (default: `http://localhost:3001`) |
+| Mobile | `apps/mobile/.env` | `EXPO_PUBLIC_API_URL` (default: `http://localhost:3001`) |
+
+## Deploying Changes
+
+After making code changes, use the following commands to push updates to each hosting platform.
+
+### Web App → Vercel
+
+Vercel deploys automatically on every push to `main`. No manual commands needed.
+
+```bash
+git add .
+git commit -m "your changes"
+git push origin main
+# Vercel detects the push and rebuilds automatically
+```
+
+### API → Render
+
+Render deploys automatically on every push to `main` (via the Docker build).
+
+```bash
+git add .
+git commit -m "your changes"
+git push origin main
+# Render detects the push and rebuilds from Dockerfile
+```
+
+If you changed the database schema:
+
+```bash
+# Render runs migrations automatically via Dockerfile,
+# but you can trigger manually if needed:
+pnpm --filter api exec prisma migrate deploy
+```
+
+### Database → Neon
+
+Neon hosts the PostgreSQL database — no deployment needed for data. If you modified the Prisma schema:
+
+```bash
+# Generate a new migration locally
+pnpm --filter api exec prisma migrate dev --name describe_your_change
+
+# Commit and push — the migration runs on Render during build
+git add .
+git commit -m "add migration: describe_your_change"
+git push origin main
+```
+
+### Mobile App → Expo Go
+
+Mobile updates are **not** auto-deployed on push. Run this manually:
+
+```bash
+cd apps/mobile
+eas update --branch preview --message "describe your changes"
+# Pushes an OTA update — users get it next time they open the app
+```
+
+If you need a new native build (changed native dependencies, updated `app.json`):
+
+```bash
+cd apps/mobile
+eas build --platform android --profile preview   # Android APK
+eas build --platform ios --profile preview        # iOS (requires Apple Developer account)
 ```
 
 ## API Endpoints (38 total)
@@ -127,3 +274,4 @@ pnpm benchmark
 - **Mobile:** Expo / React Native, Expo Router
 - **Testing:** Jest, Supertest (real DB, no mocks)
 - **Monorepo:** Turborepo + pnpm workspaces
+- **Hosting:** Vercel (Web), Render (API), Neon (DB), Expo (Mobile)
