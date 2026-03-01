@@ -38,8 +38,6 @@ RUN find /app/deployed/node_modules -path '*/.prisma/client' -type d \
 FROM node:18-alpine AS runner
 WORKDIR /app
 
-ENV NODE_ENV=production
-
 COPY --from=builder /app/deployed ./
 
 EXPOSE 3001
