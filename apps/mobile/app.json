@@ -17,6 +17,21 @@
         "backgroundColor": "#2563eb"
       }
     },
-    "plugins": ["expo-router", "expo-secure-store"]
+    "plugins": [
+      "expo-router",
+      "expo-secure-store"
+    ],
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "5859f749-403d-42f4-a193-d03570c0e6a9"
+      }
+    },
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/5859f749-403d-42f4-a193-d03570c0e6a9"
+    }
   }
 }
