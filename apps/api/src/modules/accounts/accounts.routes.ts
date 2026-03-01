@@ -34,7 +34,7 @@ const accountsRouter = Router();
 accountsRouter.get(
   '/',
   authenticate,
-  authorize('ADMIN'),
+  authorize('ADMIN', 'TECHNICIAN'),
   asyncHandler(async (req: Request, res: Response, _next: NextFunction) => {
     const pagination = parsePaginationQuery(req.query as { cursor?: string; limit?: string });
     const result = await listAccounts(pagination);

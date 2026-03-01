@@ -43,7 +43,7 @@ afterAll(async () => {
 });
 
 // ---------------------------------------------------------------------------
-// GET /api/accounts — ADMIN only
+// GET /api/accounts — ADMIN and TECHNICIAN
 // ---------------------------------------------------------------------------
 describe('GET /api/accounts', () => {
   it('allows ADMIN', async () => {
@@ -54,11 +54,12 @@ describe('GET /api/accounts', () => {
     expect(res.body.success).toBe(true);
   });
 
-  it('forbids TECHNICIAN', async () => {
+  it('allows TECHNICIAN', async () => {
     const res = await request(app)
       .get('/api/accounts')
       .set('Authorization', `Bearer ${techToken}`);
-    expect(res.status).toBe(403);
+    expect(res.status).toBe(200);
+    expect(res.body.success).toBe(true);
   });
 
   it('forbids CUSTOMER', async () => {
@@ -100,15 +101,13 @@ describe('GET /api/accounts/:id', () => {
     expect(res.status).toBe(403);
   });
 
-  it('allows TECHNICIAN to access accounts', async () => {
-    // Route authorize includes TECHNICIAN, but requireAccount ownership check
-    // means TECH without matching account gets forbidden
+  it('allows TECHNICIAN to access any account', async () => {
+    // TECHNICIAN bypasses ownership checks (same as ADMIN) for field service
     const res = await request(app)
       .get(`/api/accounts/${fixtures.customer.accountId}`)
       .set('Authorization', `Bearer ${techToken}`);
-    // TECHNICIAN is in the authorize list but requireAccount checks ownership;
-    // since tech's account != customer's account, this should be 403
-    expect(res.status).toBe(403);
+    expect(res.status).toBe(200);
+    expect(res.body.success).toBe(true);
   });
 
   it('requires auth', async () => {
@@ -249,15 +248,13 @@ describe('GET /api/accounts/:id/meters', () => {
     expect(res.body.success).toBe(true);
   });
 
-  it('allows TECHNICIAN to access account meters', async () => {
-    // TECHNICIAN is authorized, but requireAccount checks ownership
-    // TECH's account != customer's account, so this depends on requireAccount behavior
-    // requireAccount skips for ADMIN only; TECH will be checked for ownership
+  it('allows TECHNICIAN to access any account meters', async () => {
+    // TECHNICIAN bypasses ownership checks for field service access
     const res = await request(app)
       .get(`/api/accounts/${fixtures.customer.accountId}/meters`)
       .set('Authorization', `Bearer ${techToken}`);
-    // TECH is in authorize list but requireAccount will block non-matching account
-    expect(res.status).toBe(403);
+    expect(res.status).toBe(200);
+    expect(res.body.success).toBe(true);
   });
 
   it('allows TECHNICIAN to access own account meters', async () => {
@@ -307,22 +304,14 @@ describe('POST /api/accounts/:id/meters', () => {
     expect(res.body.success).toBe(true);
   });
 
-  it('allows TECHNICIAN on own-scoped account', async () => {
-    // TECH is authorized but requireAccount checks ownership
-    // TECH can create meters on their own account
-    const res = await request(app)
-      .post(`/api/accounts/${fixtures.tech.accountId}/meters`)
-      .set('Authorization', `Bearer ${techToken}`)
-      .send(meterPayload);
-    expect(res.status).toBe(201);
-  });
-
-  it('forbids TECHNICIAN on other accounts', async () => {
+  it('allows TECHNICIAN on any account', async () => {
+    // TECHNICIAN bypasses ownership checks for field service
     const res = await request(app)
       .post(`/api/accounts/${fixtures.customer.accountId}/meters`)
       .set('Authorization', `Bearer ${techToken}`)
-      .send(meterPayload);
-    expect(res.status).toBe(403);
+      .send({ ...meterPayload, serialNumber: 'MTR-TECH-001' });
+    expect(res.status).toBe(201);
+    expect(res.body.success).toBe(true);
   });
 
   it('forbids CUSTOMER', async () => {
@@ -354,15 +343,12 @@ describe('GET /api/meters/:id', () => {
   });
 
   it('allows TECHNICIAN to access any meter', async () => {
-    // TECH is authorized; requireResourceOwnership skips for ADMIN only
-    // but TECH's account != meter1's account. However, let's check the middleware:
-    // requireResourceOwnership checks req.account.id vs meter's accountId
+    // TECHNICIAN bypasses ownership checks for field service access
     const res = await request(app)
       .get(`/api/meters/${fixtures.meter1Id}`)
       .set('Authorization', `Bearer ${techToken}`);
-    // TECH has a different account than meter1 (which belongs to customer),
-    // so requireResourceOwnership should block
-    expect(res.status).toBe(403);
+    expect(res.status).toBe(200);
+    expect(res.body.success).toBe(true);
   });
 
   it('allows CUSTOMER to access own meter', async () => {
@@ -410,14 +396,14 @@ describe('PATCH /api/meters/:id', () => {
     expect(res.body.success).toBe(true);
   });
 
-  it('forbids TECHNICIAN on non-owned meter', async () => {
-    // TECH is authorized, but requireResourceOwnership blocks
-    // because meter1 belongs to customer's account
+  it('allows TECHNICIAN to update any meter', async () => {
+    // TECHNICIAN bypasses ownership checks for field service
     const res = await request(app)
       .patch(`/api/meters/${fixtures.meter1Id}`)
       .set('Authorization', `Bearer ${techToken}`)
       .send(updatePayload);
-    expect(res.status).toBe(403);
+    expect(res.status).toBe(200);
+    expect(res.body.success).toBe(true);
   });
 
   it('forbids CUSTOMER', async () => {
@@ -448,11 +434,13 @@ describe('GET /api/meters/:id/readings', () => {
     expect(res.body.success).toBe(true);
   });
 
-  it('forbids TECHNICIAN on non-owned meter readings', async () => {
+  it('allows TECHNICIAN to access any meter readings', async () => {
+    // TECHNICIAN bypasses ownership checks for field service
     const res = await request(app)
       .get(`/api/meters/${fixtures.meter1Id}/readings`)
       .set('Authorization', `Bearer ${techToken}`);
-    expect(res.status).toBe(403);
+    expect(res.status).toBe(200);
+    expect(res.body.success).toBe(true);
   });
 
   it('allows CUSTOMER to access own meter readings', async () => {
@@ -498,12 +486,14 @@ describe('POST /api/meters/:id/readings', () => {
     expect(res.body.success).toBe(true);
   });
 
-  it('forbids TECHNICIAN on non-owned meter', async () => {
+  it('allows TECHNICIAN to submit reading for any meter', async () => {
+    // TECHNICIAN bypasses ownership checks for field service
     const res = await request(app)
       .post(`/api/meters/${fixtures.meter1Id}/readings`)
       .set('Authorization', `Bearer ${techToken}`)
       .send({ ...readingPayload, idempotencyKey: '00000000-0000-4000-a000-000000000002' });
-    expect(res.status).toBe(403);
+    expect([200, 201]).toContain(res.status);
+    expect(res.body.success).toBe(true);
   });
 
   it('allows CUSTOMER to submit reading for own meter', async () => {

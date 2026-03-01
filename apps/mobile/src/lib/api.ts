@@ -78,3 +78,49 @@ export const subscribePush = (accountId: string, fcmToken: string, token: string
     body: JSON.stringify({ fcmToken }),
     token,
   });
+
+// ─── Accounts (admin) ────────────────────────
+export const listAccounts = (token: string) =>
+  apiFetch<any>('/api/accounts', { token });
+
+export const updateAccountStatus = (accountId: string, status: string, token: string) =>
+  apiFetch<any>(`/api/accounts/${accountId}/status`, {
+    method: 'PATCH',
+    body: JSON.stringify({ status }),
+    token,
+  });
+
+export const deleteAccount = (accountId: string, token: string) =>
+  apiFetch<any>(`/api/accounts/${accountId}`, { method: 'DELETE', token });
+
+// ─── Outages (admin/tech) ────────────────────
+export const getOutages = (token: string) =>
+  apiFetch<any>('/api/outages', { token });
+
+export const createOutage = (data: any, token: string) =>
+  apiFetch<any>('/api/outages', {
+    method: 'POST',
+    body: JSON.stringify(data),
+    token,
+  });
+
+export const resolveOutage = (id: string, token: string) =>
+  apiFetch<any>(`/api/outages/${id}/resolve`, { method: 'POST', token });
+
+// ─── Meters (admin/tech) ─────────────────────
+export const getAccountMeters = (accountId: string, token: string) =>
+  apiFetch<any>(`/api/accounts/${accountId}/meters`, { token });
+
+export const createMeter = (accountId: string, data: any, token: string) =>
+  apiFetch<any>(`/api/accounts/${accountId}/meters`, {
+    method: 'POST',
+    body: JSON.stringify(data),
+    token,
+  });
+
+export const updateMeter = (meterId: string, data: any, token: string) =>
+  apiFetch<any>(`/api/meters/${meterId}`, {
+    method: 'PATCH',
+    body: JSON.stringify(data),
+    token,
+  });

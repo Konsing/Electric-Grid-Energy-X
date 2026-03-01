@@ -124,6 +124,27 @@ export async function markAllNotificationsRead(accountId: string, token: string)
   });
 }
 
+// ─── Accounts (admin) ────────────────────────
+export async function listAccounts(token: string, cursor?: string) {
+  const params = cursor ? `?cursor=${cursor}` : '';
+  return apiFetch<any>(`/api/accounts${params}`, { token });
+}
+
+export async function updateAccountStatus(accountId: string, status: string, token: string) {
+  return apiFetch<any>(`/api/accounts/${accountId}/status`, {
+    method: 'PATCH',
+    body: JSON.stringify({ status }),
+    token,
+  });
+}
+
+export async function deleteAccount(accountId: string, token: string) {
+  return apiFetch<any>(`/api/accounts/${accountId}`, {
+    method: 'DELETE',
+    token,
+  });
+}
+
 // ─── Outages ──────────────────────────────────
 export async function getActiveOutages(token: string) {
   return apiFetch<any>('/api/outages/active', { token });
@@ -132,4 +153,48 @@ export async function getActiveOutages(token: string) {
 export async function getOutages(token: string, cursor?: string) {
   const params = cursor ? `?cursor=${cursor}` : '';
   return apiFetch<any>(`/api/outages${params}`, { token });
+}
+
+export async function createOutage(data: any, token: string) {
+  return apiFetch<any>('/api/outages', {
+    method: 'POST',
+    body: JSON.stringify(data),
+    token,
+  });
+}
+
+export async function updateOutage(id: string, data: any, token: string) {
+  return apiFetch<any>(`/api/outages/${id}`, {
+    method: 'PATCH',
+    body: JSON.stringify(data),
+    token,
+  });
+}
+
+export async function resolveOutage(id: string, token: string) {
+  return apiFetch<any>(`/api/outages/${id}/resolve`, {
+    method: 'POST',
+    token,
+  });
+}
+
+// ─── Meters ──────────────────────────────────
+export async function getAccountMeters(accountId: string, token: string) {
+  return apiFetch<any>(`/api/accounts/${accountId}/meters`, { token });
+}
+
+export async function createMeter(accountId: string, data: any, token: string) {
+  return apiFetch<any>(`/api/accounts/${accountId}/meters`, {
+    method: 'POST',
+    body: JSON.stringify(data),
+    token,
+  });
+}
+
+export async function updateMeter(meterId: string, data: any, token: string) {
+  return apiFetch<any>(`/api/meters/${meterId}`, {
+    method: 'PATCH',
+    body: JSON.stringify(data),
+    token,
+  });
 }

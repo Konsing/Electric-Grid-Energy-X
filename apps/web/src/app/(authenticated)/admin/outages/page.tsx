@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useAuth } from '@/lib/auth-context';
-import { getOutages, apiFetch } from '@/lib/api';
+import { getOutages, createOutage, resolveOutage } from '@/lib/api';
 
 export default function AdminOutagesPage() {
   const { user, token } = useAuth();
@@ -30,11 +30,7 @@ export default function AdminOutagesPage() {
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!token) return;
-    await apiFetch('/api/outages', {
-      method: 'POST',
-      body: JSON.stringify(form),
-      token,
-    });
+    await createOutage(form, token);
     setShowCreate(false);
     setForm({ title: '', description: '', affectedArea: '', severity: 'MEDIUM' });
     loadOutages();
@@ -42,7 +38,7 @@ export default function AdminOutagesPage() {
 
   const handleResolve = async (id: string) => {
     if (!token) return;
-    await apiFetch(`/api/outages/${id}/resolve`, { method: 'POST', token });
+    await resolveOutage(id, token);
     loadOutages();
   };
 

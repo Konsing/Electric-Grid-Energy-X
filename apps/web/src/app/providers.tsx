@@ -6,7 +6,7 @@ import { ThemeProvider } from '@/lib/theme-context';
 export function Providers({ children }: { children: React.ReactNode }) {
   return (
     <ThemeProvider>
-      <AuthProvider>{children}</AuthProvider>
+      <AuthProvider>{children as any}</AuthProvider>
     </ThemeProvider>
   );
 }

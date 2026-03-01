@@ -12,8 +12,9 @@ import { prisma } from '../lib/prisma';
 export function requireAccount(paramName: string = 'id') {
   return async (req: Request, _res: Response, next: NextFunction): Promise<void> => {
     try {
-      // Admins skip ownership check
-      if (req.user?.role === 'ADMIN') {
+      // Admins and technicians skip ownership check
+      // (technicians need access to any account's meters/readings for field service)
+      if (req.user?.role === 'ADMIN' || req.user?.role === 'TECHNICIAN') {
         return next();
       }
 
@@ -53,7 +54,7 @@ export function requireResourceOwnership(
 ) {
   return async (req: Request, _res: Response, next: NextFunction): Promise<void> => {
     try {
-      if (req.user?.role === 'ADMIN') {
+      if (req.user?.role === 'ADMIN' || req.user?.role === 'TECHNICIAN') {
         return next();
       }
 

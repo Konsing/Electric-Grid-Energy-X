@@ -15,8 +15,12 @@ const navItems = [
 ];
 
 const adminItems = [
-  { href: '/admin/accounts', label: 'Manage Accounts' },
   { href: '/admin/outages', label: 'Manage Outages' },
+  { href: '/admin/meters', label: 'Manage Meters' },
+];
+
+const adminOnlyItems = [
+  { href: '/admin/accounts', label: 'Manage Accounts' },
 ];
 
 export function Navigation() {
@@ -27,6 +31,8 @@ export function Navigation() {
   if (!user) return null;
 
   const isAdmin = user.role === 'ADMIN';
+  const isTechnician = user.role === 'TECHNICIAN';
+  const showAdminItems = isAdmin || isTechnician;
 
   return (
     <nav className="bg-white dark:bg-slate-900 border-b border-gray-200 dark:border-slate-700">
@@ -53,8 +59,22 @@ export function Navigation() {
                   {item.label}
                 </Link>
               ))}
-              {isAdmin &&
+              {showAdminItems &&
                 adminItems.map((item) => (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    className={`inline-flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors ${
+                      pathname === item.href
+                        ? 'bg-yellow-50 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400'
+                        : 'text-yellow-600 dark:text-yellow-400 hover:text-yellow-900 dark:hover:text-yellow-300 hover:bg-yellow-50 dark:hover:bg-yellow-900/20'
+                    }`}
+                  >
+                    {item.label}
+                  </Link>
+                ))}
+              {isAdmin &&
+                adminOnlyItems.map((item) => (
                   <Link
                     key={item.href}
                     href={item.href}

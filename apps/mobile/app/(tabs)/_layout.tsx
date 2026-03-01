@@ -2,6 +2,7 @@ import { Tabs } from 'expo-router';
 import { TouchableOpacity } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { useTheme } from '../../src/lib/theme-context';
+import { useAuth } from '../../src/lib/auth-context';
 
 function ThemeToggle() {
   const { isDark, toggleTheme, colors } = useTheme();
@@ -14,6 +15,10 @@ function ThemeToggle() {
 
 export default function TabLayout() {
   const { colors } = useTheme();
+  const { user } = useAuth();
+
+  const isAdmin = user?.role === 'ADMIN';
+  const isTechOrAdmin = user?.role === 'ADMIN' || user?.role === 'TECHNICIAN';
 
   return (
     <Tabs
@@ -62,6 +67,30 @@ export default function TabLayout() {
         options={{
           title: 'Profile',
           tabBarIcon: ({ color, size }) => <Feather name="user" size={size} color={color} />,
+        }}
+      />
+      <Tabs.Screen
+        name="manage-outages"
+        options={{
+          title: 'Mgmt Outages',
+          href: isTechOrAdmin ? '/manage-outages' : null,
+          tabBarIcon: ({ color, size }) => <Feather name="tool" size={size} color={color} />,
+        }}
+      />
+      <Tabs.Screen
+        name="manage-meters"
+        options={{
+          title: 'Meters',
+          href: isTechOrAdmin ? '/manage-meters' : null,
+          tabBarIcon: ({ color, size }) => <Feather name="cpu" size={size} color={color} />,
+        }}
+      />
+      <Tabs.Screen
+        name="admin-accounts"
+        options={{
+          title: 'Accounts',
+          href: isAdmin ? '/admin-accounts' : null,
+          tabBarIcon: ({ color, size }) => <Feather name="users" size={size} color={color} />,
         }}
       />
     </Tabs>
