@@ -144,65 +144,35 @@ pnpm exec expo start --tunnel --go --clear
 | Web | `apps/web/.env` | `NEXT_PUBLIC_API_URL` (default: `http://localhost:3001`) |
 | Mobile | `apps/mobile/.env` | `EXPO_PUBLIC_API_URL` (default: `http://localhost:3001`) |
 
-## Deploying Changes
+## CI/CD Pipeline
 
-After making code changes, use the following commands to push updates to each hosting platform.
-
-### Web App → Vercel
-
-Vercel deploys automatically on every push to `main`. No manual commands needed.
+All deployments are automated via **git push** — no manual deploy commands needed.
 
 ```bash
 git add .
 git commit -m "your changes"
 git push origin main
-# Vercel detects the push and rebuilds automatically
 ```
 
-### API → Render
+| Platform | Trigger | How |
+|----------|---------|-----|
+| **Web App** | Push to `main` | Vercel auto-builds from Git |
+| **API** | Push to `main` | Render auto-builds from Dockerfile |
+| **Mobile App** | Push to `main` (changes in `apps/mobile/` or `packages/shared/`) | GitHub Actions → `eas update` OTA push |
+| **Database** | Push to `main` (schema changes) | Prisma migrations run on Render during build |
 
-Render deploys automatically on every push to `main` (via the Docker build).
+### Database Schema Changes
 
-```bash
-git add .
-git commit -m "your changes"
-git push origin main
-# Render detects the push and rebuilds from Dockerfile
-```
-
-If you changed the database schema:
+If you modified the Prisma schema, generate a migration before pushing:
 
 ```bash
-# Render runs migrations automatically via Dockerfile,
-# but you can trigger manually if needed:
-pnpm --filter api exec prisma migrate deploy
-```
-
-### Database → Neon
-
-Neon hosts the PostgreSQL database — no deployment needed for data. If you modified the Prisma schema:
-
-```bash
-# Generate a new migration locally
 pnpm --filter api exec prisma migrate dev --name describe_your_change
-
-# Commit and push — the migration runs on Render during build
-git add .
-git commit -m "add migration: describe_your_change"
-git push origin main
+# Then commit and push — the migration runs automatically on Render
 ```
 
-### Mobile App → Expo Go
+### Mobile Native Builds
 
-Mobile updates are **not** auto-deployed on push. Run this manually:
-
-```bash
-cd apps/mobile
-eas update --branch preview --message "describe your changes"
-# Pushes an OTA update — users get it next time they open the app
-```
-
-If you need a new native build (changed native dependencies, updated `app.json`):
+OTA updates handle JS/UI changes automatically. If you change native dependencies or `app.json`, you need a full rebuild:
 
 ```bash
 cd apps/mobile
