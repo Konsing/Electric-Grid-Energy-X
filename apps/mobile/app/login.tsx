@@ -36,7 +36,7 @@ export default function LoginScreen() {
       const isStaff = res.data.user.role === 'ADMIN' || res.data.user.role === 'TECHNICIAN';
       router.replace(isStaff ? '/(tabs)/outages' : '/(tabs)/dashboard');
     } catch (err: any) {
-      Alert.alert('Error', err.message || 'Login failed');
+      Alert.alert('Error', err.message || 'Login failed!');
     } finally {
       setLoading(false);
     }
