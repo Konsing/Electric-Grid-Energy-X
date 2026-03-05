@@ -11,7 +11,12 @@ export default function Index() {
 
   useEffect(() => {
     if (!isLoading) {
-      router.replace(user ? '/(tabs)/dashboard' : '/login');
+      if (!user) {
+        router.replace('/login');
+      } else {
+        const isStaff = user.role === 'ADMIN' || user.role === 'TECHNICIAN';
+        router.replace(isStaff ? '/(tabs)/outages' : '/(tabs)/dashboard');
+      }
     }
   }, [user, isLoading]);
 

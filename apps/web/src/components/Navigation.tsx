@@ -6,10 +6,13 @@ import { useTheme } from '@/lib/theme-context';
 import { usePathname } from 'next/navigation';
 import { Sun, Moon } from 'lucide-react';
 
-const navItems = [
+const customerItems = [
   { href: '/dashboard', label: 'Dashboard' },
   { href: '/billing', label: 'Billing' },
   { href: '/notifications', label: 'Notifications' },
+];
+
+const commonItems = [
   { href: '/outages', label: 'Outages' },
   { href: '/account', label: 'Account' },
 ];
@@ -32,6 +35,7 @@ export function Navigation() {
 
   const isAdmin = user.role === 'ADMIN';
   const isTechnician = user.role === 'TECHNICIAN';
+  const isCustomer = !isAdmin && !isTechnician;
   const showAdminItems = isAdmin || isTechnician;
 
   return (
@@ -46,7 +50,21 @@ export function Navigation() {
               </span>
             </Link>
             <div className="hidden sm:ml-8 sm:flex sm:space-x-4">
-              {navItems.map((item) => (
+              {isCustomer &&
+                customerItems.map((item) => (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    className={`inline-flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors ${
+                      pathname === item.href
+                        ? 'bg-brand-50 dark:bg-brand-900/30 text-brand-700 dark:text-brand-400'
+                        : 'text-gray-600 dark:text-slate-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-slate-800'
+                    }`}
+                  >
+                    {item.label}
+                  </Link>
+                ))}
+              {commonItems.map((item) => (
                 <Link
                   key={item.href}
                   href={item.href}
