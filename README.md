@@ -136,13 +136,21 @@ pnpm exec expo start --tunnel --go --clear
 > **`--tunnel`** routes through ngrok so your phone can reach the dev server even on different networks.
 > **`--go`** opens in Expo Go automatically. **`--clear`** resets the Metro bundler cache.
 
+> **Important:** The mobile `.env` defaults to the **production** API URL (`https://egx-api.onrender.com`).
+> To test against your local API, change it to your machine's local IP:
+> ```
+> # Update apps/mobile/.env
+> EXPO_PUBLIC_API_URL=http://<YOUR_LOCAL_IP>:3001
+> ```
+> Then restart Expo with `--clear` to pick up the change. **Remember to switch it back** to the production URL before pushing or running `eas update`.
+
 ### Environment Variables
 
 | App | File | Key Variable |
 |-----|------|-------------|
 | API | `apps/api/.env` | `DATABASE_URL`, `JWT_SECRET`, `MOCK_AUTH` |
 | Web | `apps/web/.env` | `NEXT_PUBLIC_API_URL` (default: `http://localhost:3001`) |
-| Mobile | `apps/mobile/.env` | `EXPO_PUBLIC_API_URL` (default: `http://localhost:3001`) |
+| Mobile | `apps/mobile/.env` | `EXPO_PUBLIC_API_URL` (default: `https://egx-api.onrender.com`) |
 
 ## CI/CD Pipeline
 
@@ -169,6 +177,24 @@ If you modified the Prisma schema, generate a migration before pushing:
 pnpm --filter api exec prisma migrate dev --name describe_your_change
 # Then commit and push — the migration runs automatically on Render
 ```
+
+### Seeding the Database
+
+Seed the local database:
+
+```bash
+cd apps/api
+npx tsx prisma/seed.ts
+```
+
+Seed the production database (Neon) directly:
+
+```bash
+cd apps/api
+DATABASE_URL="your-neon-database-url" npx tsx prisma/seed.ts
+```
+
+> Find your Neon URL in **Render Dashboard → API service → Environment → DATABASE_URL**.
 
 ### Mobile Native Builds
 
@@ -233,8 +259,14 @@ pnpm benchmark
 |-------|------|----------|
 | admin@egx.dev | ADMIN | password123 |
 | tech@egx.dev | TECHNICIAN | password123 |
+| maria.santos@egx.dev | TECHNICIAN | password123 |
 | customer@egx.dev | CUSTOMER | password123 |
 | customer2@egx.dev | CUSTOMER | password123 |
+| lisa.chen@email.com | CUSTOMER | password123 |
+| marcus.johnson@email.com | CUSTOMER | password123 |
+| sarah.williams@email.com | CUSTOMER (Suspended) | password123 |
+| david.kim@email.com | CUSTOMER | password123 |
+| rachel.torres@email.com | CUSTOMER | password123 |
 
 ## Tech Stack
 

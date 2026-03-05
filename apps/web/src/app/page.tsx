@@ -10,7 +10,12 @@ export default function Home() {
 
   useEffect(() => {
     if (!isLoading) {
-      router.replace(user ? '/dashboard' : '/login');
+      if (!user) {
+        router.replace('/login');
+      } else {
+        const isStaff = user.role === 'ADMIN' || user.role === 'TECHNICIAN';
+        router.replace(isStaff ? '/outages' : '/dashboard');
+      }
     }
   }, [user, isLoading, router]);
 

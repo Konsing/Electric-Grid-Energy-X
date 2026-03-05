@@ -25,7 +25,8 @@ export default function LoginPage() {
     try {
       const res = await login(email, password);
       setAuth(res.data.token, res.data.user);
-      router.push('/dashboard');
+      const isStaff = res.data.user.role === 'ADMIN' || res.data.user.role === 'TECHNICIAN';
+      router.push(isStaff ? '/outages' : '/dashboard');
     } catch (err: any) {
       setError(err.message || 'Login failed');
     } finally {
@@ -40,7 +41,8 @@ export default function LoginPage() {
     try {
       const res = await devLogin(devEmail);
       setAuth(res.data.token, res.data.user);
-      router.push('/dashboard');
+      const isStaff = res.data.user.role === 'ADMIN' || res.data.user.role === 'TECHNICIAN';
+      router.push(isStaff ? '/outages' : '/dashboard');
     } catch (err: any) {
       setError(err.message || 'Login failed');
     } finally {

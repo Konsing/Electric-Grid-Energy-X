@@ -19,6 +19,7 @@ export default function TabLayout() {
 
   const isAdmin = user?.role === 'ADMIN';
   const isTechOrAdmin = user?.role === 'ADMIN' || user?.role === 'TECHNICIAN';
+  const isCustomer = !isTechOrAdmin;
 
   return (
     <Tabs
@@ -38,6 +39,7 @@ export default function TabLayout() {
         name="dashboard"
         options={{
           title: 'Dashboard',
+          href: isCustomer ? '/dashboard' : null,
           tabBarIcon: ({ color, size }) => <Feather name="zap" size={size} color={color} />,
         }}
       />
@@ -45,6 +47,7 @@ export default function TabLayout() {
         name="billing"
         options={{
           title: 'Billing',
+          href: isCustomer ? '/billing' : null,
           tabBarIcon: ({ color, size }) => <Feather name="credit-card" size={size} color={color} />,
         }}
       />
@@ -52,6 +55,7 @@ export default function TabLayout() {
         name="notifications"
         options={{
           title: 'Alerts',
+          href: isCustomer ? '/notifications' : null,
           tabBarIcon: ({ color, size }) => <Feather name="bell" size={size} color={color} />,
         }}
       />
