@@ -109,9 +109,9 @@ export default function LoginPage() {
           </p>
         </form>
 
-        {/* Dev login shortcuts */}
+        {/* Demo login shortcuts */}
         <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-700 rounded-xl p-4">
-          <p className="text-sm font-medium text-yellow-800 dark:text-yellow-400 mb-3">Dev Quick Login</p>
+          <p className="text-sm font-medium text-yellow-800 dark:text-yellow-400 mb-3">Demo Accounts</p>
           <div className="flex gap-2">
             {[
               { email: 'admin@egx.dev', label: 'Admin' },
