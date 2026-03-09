@@ -75,7 +75,7 @@ export default function LoginScreen() {
       </View>
 
       <View style={[styles.devSection, { backgroundColor: colors.devSectionBg, borderColor: colors.devSectionBorder }]}>
-        <Text style={[styles.devTitle, { color: colors.devTitle }]}>Dev Quick Login</Text>
+        <Text style={[styles.devTitle, { color: colors.devTitle }]}>Demo Accounts</Text>
         <View style={styles.devButtons}>
           {[
             { email: 'admin@egx.dev', label: 'Admin' },
