@@ -3,7 +3,7 @@ import { View, Text, ScrollView, StyleSheet, RefreshControl } from 'react-native
 import { Feather } from '@expo/vector-icons';
 import { useAuth } from '../../src/lib/auth-context';
 import { useTheme } from '../../src/lib/theme-context';
-import { getActiveOutages } from '../../src/lib/api';
+import { getOutages } from '../../src/lib/api';
 
 export default function OutagesScreen() {
   const { token } = useAuth();
@@ -13,7 +13,7 @@ export default function OutagesScreen() {
 
   const load = async () => {
     if (!token) return;
-    const res = await getActiveOutages(token).catch(() => null);
+    const res = await getOutages(token).catch(() => null);
     setOutages(res?.data || []);
   };
 
@@ -29,6 +29,14 @@ export default function OutagesScreen() {
     }
   };
 
+  const statusColor = (s: string) => {
+    switch (s) {
+      case 'RESOLVED': return colors.success;
+      case 'IN_PROGRESS': return colors.brand;
+      default: return colors.warning;
+    }
+  };
+
   return (
     <ScrollView
       style={[styles.container, { backgroundColor: colors.background }]}
@@ -38,10 +46,17 @@ export default function OutagesScreen() {
         <View key={o.id} style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.surfaceBorder }]}>
           <View style={styles.header}>
             <Text style={[styles.title, { color: colors.text }]}>{o.title}</Text>
-            <View style={[styles.badge, { backgroundColor: severityColor(o.severity) + '20' }]}>
-              <Text style={[styles.badgeText, { color: severityColor(o.severity) }]}>
-                {o.severity}
-              </Text>
+            <View style={styles.badges}>
+              <View style={[styles.badge, { backgroundColor: severityColor(o.severity) + '20' }]}>
+                <Text style={[styles.badgeText, { color: severityColor(o.severity) }]}>
+                  {o.severity}
+                </Text>
+              </View>
+              <View style={[styles.badge, { backgroundColor: statusColor(o.status) + '20' }]}>
+                <Text style={[styles.badgeText, { color: statusColor(o.status) }]}>
+                  {o.status}
+                </Text>
+              </View>
             </View>
           </View>
           <Text style={[styles.area, { color: colors.textSecondary }]}>{o.affectedArea}</Text>
@@ -50,12 +65,15 @@ export default function OutagesScreen() {
           {o.estimatedResolution && (
             <Text style={[styles.time, { color: colors.textTertiary }]}>Est. Resolution: {new Date(o.estimatedResolution).toLocaleString()}</Text>
           )}
+          {o.resolvedAt && (
+            <Text style={[styles.time, { color: colors.success }]}>Resolved: {new Date(o.resolvedAt).toLocaleString()}</Text>
+          )}
         </View>
       ))}
       {outages.length === 0 && (
         <View style={styles.emptyContainer}>
           <Feather name="check-circle" size={40} color={colors.success} style={{ marginBottom: 12 }} />
-          <Text style={[styles.emptyText, { color: colors.success }]}>No active outages</Text>
+          <Text style={[styles.emptyText, { color: colors.success }]}>No outages reported</Text>
         </View>
       )}
     </ScrollView>
@@ -70,7 +88,8 @@ const styles = StyleSheet.create({
   },
   header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   title: { fontSize: 16, fontWeight: '600', flex: 1 },
-  badge: { paddingHorizontal: 8, paddingVertical: 2, borderRadius: 12, marginLeft: 8 },
+  badges: { flexDirection: 'row', gap: 4, marginLeft: 8 },
+  badge: { paddingHorizontal: 8, paddingVertical: 2, borderRadius: 12 },
   badgeText: { fontSize: 11, fontWeight: '600' },
   area: { fontSize: 13, marginTop: 6 },
   desc: { fontSize: 13, marginTop: 8 },
