@@ -43,63 +43,63 @@ export default function AdminOutagesPage() {
   };
 
   if (user?.role !== 'ADMIN' && user?.role !== 'TECHNICIAN') {
-    return <div className="text-red-500 dark:text-red-400">Access denied</div>;
+    return <div className="text-red-400">Access denied</div>;
   }
 
-  if (loading) return <div className="text-gray-500 dark:text-slate-400">Loading outages...</div>;
+  if (loading) return <div className="text-zinc-500">Loading outages...</div>;
 
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Manage Outages</h1>
+        <h1 className="text-2xl font-bold tracking-tight text-zinc-50">Manage Outages</h1>
         <button
           onClick={() => setShowCreate(!showCreate)}
-          className="px-4 py-2 bg-brand-600 text-white rounded-lg hover:bg-brand-700 text-sm"
+          className="px-4 py-2 bg-zinc-50 text-zinc-950 rounded-md hover:bg-zinc-200 text-sm font-semibold"
         >
           Report Outage
         </button>
       </div>
 
       {showCreate && (
-        <form onSubmit={handleCreate} className="bg-white dark:bg-slate-900 p-6 rounded-xl shadow-sm border dark:border-slate-700 space-y-4">
+        <form onSubmit={handleCreate} className="bg-zinc-900 p-6 rounded-lg border border-zinc-800 space-y-4">
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-slate-300">Title</label>
+              <label className="block text-sm text-zinc-300">Title</label>
               <input
                 type="text"
                 value={form.title}
                 onChange={(e) => setForm({ ...form, title: e.target.value })}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-gray-900 dark:text-slate-100"
+                className="mt-1 block w-full px-3 py-2 bg-zinc-900 border border-zinc-700 rounded-md text-zinc-100 placeholder-zinc-600 focus:border-blue-500 focus:ring-1 focus:ring-blue-500/50 outline-none"
                 required
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-slate-300">Affected Area</label>
+              <label className="block text-sm text-zinc-300">Affected Area</label>
               <input
                 type="text"
                 value={form.affectedArea}
                 onChange={(e) => setForm({ ...form, affectedArea: e.target.value })}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-gray-900 dark:text-slate-100"
+                className="mt-1 block w-full px-3 py-2 bg-zinc-900 border border-zinc-700 rounded-md text-zinc-100 placeholder-zinc-600 focus:border-blue-500 focus:ring-1 focus:ring-blue-500/50 outline-none"
                 required
               />
             </div>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-slate-300">Description</label>
+            <label className="block text-sm text-zinc-300">Description</label>
             <textarea
               value={form.description}
               onChange={(e) => setForm({ ...form, description: e.target.value })}
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-gray-900 dark:text-slate-100"
+              className="mt-1 block w-full px-3 py-2 bg-zinc-900 border border-zinc-700 rounded-md text-zinc-100 placeholder-zinc-600 focus:border-blue-500 focus:ring-1 focus:ring-blue-500/50 outline-none"
               rows={3}
               required
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-slate-300">Severity</label>
+            <label className="block text-sm text-zinc-300">Severity</label>
             <select
               value={form.severity}
               onChange={(e) => setForm({ ...form, severity: e.target.value })}
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-gray-900 dark:text-slate-100"
+              className="mt-1 block w-full px-3 py-2 bg-zinc-900 border border-zinc-700 rounded-md text-zinc-100 focus:border-blue-500 focus:ring-1 focus:ring-blue-500/50 outline-none"
             >
               <option value="LOW">Low</option>
               <option value="MEDIUM">Medium</option>
@@ -108,13 +108,13 @@ export default function AdminOutagesPage() {
             </select>
           </div>
           <div className="flex gap-2">
-            <button type="submit" className="px-4 py-2 bg-brand-600 text-white rounded-lg text-sm">
+            <button type="submit" className="px-4 py-2 bg-zinc-50 text-zinc-950 rounded-md hover:bg-zinc-200 text-sm font-semibold">
               Create
             </button>
             <button
               type="button"
               onClick={() => setShowCreate(false)}
-              className="px-4 py-2 bg-gray-100 dark:bg-slate-700 text-gray-700 dark:text-slate-300 rounded-lg text-sm hover:bg-gray-200 dark:hover:bg-slate-600"
+              className="px-4 py-2 border border-zinc-700 text-zinc-300 rounded-md hover:bg-zinc-800 text-sm"
             >
               Cancel
             </button>
@@ -124,31 +124,33 @@ export default function AdminOutagesPage() {
 
       <div className="space-y-4">
         {outages.map((outage) => (
-          <div key={outage.id} className="bg-white dark:bg-slate-900 p-6 rounded-xl shadow-sm border dark:border-slate-700">
+          <div key={outage.id} className="bg-zinc-900 p-6 rounded-lg border border-zinc-800">
             <div className="flex justify-between items-start">
               <div>
-                <h3 className="font-semibold dark:text-white">{outage.title}</h3>
-                <p className="text-sm text-gray-500 dark:text-slate-400">{outage.affectedArea}</p>
-                <p className="text-sm text-gray-600 dark:text-slate-400 mt-2">{outage.description}</p>
+                <h3 className="font-semibold text-zinc-50">{outage.title}</h3>
+                <p className="text-sm text-zinc-400">{outage.affectedArea}</p>
+                <p className="text-sm text-zinc-400 mt-2">{outage.description}</p>
               </div>
               <div className="flex gap-2 items-start">
-                <span className={`px-2 py-0.5 rounded text-xs font-medium ${
-                  outage.severity === 'CRITICAL' ? 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-400' :
-                  outage.severity === 'HIGH' ? 'bg-orange-100 dark:bg-orange-900/30 text-orange-800 dark:text-orange-400' :
-                  'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-400'
+                <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${
+                  outage.severity === 'CRITICAL' ? 'bg-red-950 text-red-400' :
+                  outage.severity === 'HIGH' ? 'bg-orange-950 text-orange-400' :
+                  outage.severity === 'MEDIUM' ? 'bg-yellow-950 text-yellow-400' :
+                  'bg-zinc-800 text-zinc-300'
                 }`}>
                   {outage.severity}
                 </span>
-                <span className={`px-2 py-0.5 rounded text-xs font-medium ${
-                  outage.status === 'RESOLVED' ? 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400' :
-                  'bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-400'
+                <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${
+                  outage.status === 'RESOLVED' ? 'bg-green-950 text-green-400' :
+                  outage.status === 'IN_PROGRESS' ? 'bg-blue-950 text-blue-400' :
+                  'bg-yellow-950 text-yellow-400'
                 }`}>
                   {outage.status}
                 </span>
                 {outage.status !== 'RESOLVED' && (
                   <button
                     onClick={() => handleResolve(outage.id)}
-                    className="px-3 py-1 text-xs bg-green-600 text-white rounded hover:bg-green-700"
+                    className="px-3 py-1 text-xs bg-green-950 text-green-400 rounded-md hover:bg-green-900 font-medium"
                   >
                     Resolve
                   </button>
