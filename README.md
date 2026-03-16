@@ -25,7 +25,7 @@ Full-stack portfolio project for a fictional regional electricity provider. Demo
   <img src="docs/screenshots/mobile-admin-2.png?v=2" alt="Mobile Admin View 2" width="19%" />
 </p>
 <p align="center">
-  <em>Login (furthest left) Customer (left two) &nbsp;&nbsp;|&nbsp;&nbsp; Admin (right two)</em>
+  <em>Login (furthest left) &nbsp;&nbsp;|&nbsp;&nbsp; Customer (left two) &nbsp;&nbsp;|&nbsp;&nbsp; Admin (right two)</em>
 </p>
 
 ## Live Demo
