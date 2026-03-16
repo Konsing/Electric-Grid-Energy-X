@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useAuth } from '@/lib/auth-context';
-import { login, devLogin } from '@/lib/api';
+import { login } from '@/lib/api';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -32,12 +32,12 @@ export default function LoginPage() {
     }
   };
 
-  const handleDevLogin = async (devEmail: string) => {
+  const handleDemoLogin = async (demoEmail: string) => {
     setError('');
     setLoading(true);
 
     try {
-      const res = await devLogin(devEmail);
+      const res = await login(demoEmail, 'password-123');
       setAuth(res.data.token, res.data.user);
       const isStaff = res.data.user.role === 'ADMIN' || res.data.user.role === 'TECHNICIAN';
       router.push(isStaff ? '/outages' : '/dashboard');
@@ -133,7 +133,7 @@ export default function LoginPage() {
               ].map((u) => (
                 <button
                   key={u.email}
-                  onClick={() => handleDevLogin(u.email)}
+                  onClick={() => handleDemoLogin(u.email)}
                   disabled={loading}
                   className="flex-1 py-1.5 px-3 text-xs font-medium rounded-md border border-zinc-700 text-zinc-400 hover:bg-zinc-800 disabled:opacity-50"
                 >

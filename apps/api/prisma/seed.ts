@@ -18,7 +18,7 @@ async function main() {
   await prisma.account.deleteMany();
   await prisma.user.deleteMany();
 
-  const passwordHash = await bcrypt.hash('password123', 10);
+  const passwordHash = await bcrypt.hash('password-123', 10);
   const now = new Date();
 
   // ─── Users ────────────────────────────────────────
