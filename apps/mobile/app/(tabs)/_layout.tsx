@@ -1,17 +1,7 @@
 import { Tabs } from 'expo-router';
-import { TouchableOpacity } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { useTheme } from '../../src/lib/theme-context';
 import { useAuth } from '../../src/lib/auth-context';
-
-function ThemeToggle() {
-  const { isDark, toggleTheme, colors } = useTheme();
-  return (
-    <TouchableOpacity onPress={toggleTheme} style={{ marginRight: 16 }}>
-      <Feather name={isDark ? 'sun' : 'moon'} size={20} color={colors.text} />
-    </TouchableOpacity>
-  );
-}
 
 export default function TabLayout() {
   const { colors } = useTheme();
@@ -32,7 +22,6 @@ export default function TabLayout() {
         },
         headerStyle: { backgroundColor: colors.headerBackground },
         headerTitleStyle: { fontWeight: '600', color: colors.text },
-        headerRight: () => <ThemeToggle />,
       }}
     >
       <Tabs.Screen
