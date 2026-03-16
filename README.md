@@ -18,11 +18,11 @@ Full-stack portfolio project for a fictional regional electricity provider. Demo
 ## Mobile App
 
 <p align="center">
-  <img src="docs/screenshots/mobile-login.png" alt="Mobile Login" width="19%" />
-  <img src="docs/screenshots/mobile-customer-1.png" alt="Mobile Customer View 1" width="19%" />
-  <img src="docs/screenshots/mobile-customer-2.png" alt="Mobile Customer View 2" width="19%" />
-  <img src="docs/screenshots/mobile-admin-1.png" alt="Mobile Admin View 1" width="19%" />
-  <img src="docs/screenshots/mobile-admin-2.png" alt="Mobile Admin View 2" width="19%" />
+  <img src="docs/screenshots/mobile-login.png?v=2" alt="Mobile Login" width="19%" />
+  <img src="docs/screenshots/mobile-customer-1.png?v=2" alt="Mobile Customer View 1" width="19%" />
+  <img src="docs/screenshots/mobile-customer-2.png?v=2" alt="Mobile Customer View 2" width="19%" />
+  <img src="docs/screenshots/mobile-admin-1.png?v=2" alt="Mobile Admin View 1" width="19%" />
+  <img src="docs/screenshots/mobile-admin-2.png?v=2" alt="Mobile Admin View 2" width="19%" />
 </p>
 <p align="center">
   <em>Login (furthest left) Customer (left two) &nbsp;&nbsp;|&nbsp;&nbsp; Admin (right two)</em>
