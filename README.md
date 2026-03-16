@@ -107,12 +107,6 @@ pnpm --filter api dev
 # 5. Verify
 curl http://localhost:3001/api/health
 # → { "success": true, "data": { "status": "ok", "uptime": ... } }
-
-# 6. Dev login (no password needed)
-curl -X POST http://localhost:3001/api/auth/dev-login \
-  -H "Content-Type: application/json" \
-  -d '{"email":"admin@egx.dev"}'
-# → { "success": true, "data": { "token": "eyJ..." } }
 ```
 
 ## Local Development
@@ -263,18 +257,18 @@ pnpm benchmark
 
 ## Dev Users
 
-| Email | Role | Password |
-|-------|------|----------|
-| admin@egx.dev | ADMIN | password123 |
-| tech@egx.dev | TECHNICIAN | password123 |
-| maria.santos@egx.dev | TECHNICIAN | password123 |
-| customer@egx.dev | CUSTOMER | password123 |
-| customer2@egx.dev | CUSTOMER | password123 |
-| lisa.chen@email.com | CUSTOMER | password123 |
-| marcus.johnson@email.com | CUSTOMER | password123 |
-| sarah.williams@email.com | CUSTOMER (Suspended) | password123 |
-| david.kim@email.com | CUSTOMER | password123 |
-| rachel.torres@email.com | CUSTOMER | password123 |
+| Email | Role |
+|-------|------|
+| admin@egx.dev | ADMIN |
+| tech@egx.dev | TECHNICIAN |
+| maria.santos@egx.dev | TECHNICIAN |
+| customer@egx.dev | CUSTOMER |
+| customer2@egx.dev | CUSTOMER |
+| lisa.chen@email.com | CUSTOMER |
+| marcus.johnson@email.com | CUSTOMER |
+| sarah.williams@email.com | CUSTOMER (Suspended) |
+| david.kim@email.com | CUSTOMER |
+| rachel.torres@email.com | CUSTOMER |
 
 ## Tech Stack
 
