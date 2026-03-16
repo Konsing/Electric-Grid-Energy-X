@@ -66,7 +66,7 @@ const styles = StyleSheet.create({
     borderRadius: 12, padding: 14, marginBottom: 10,
     borderWidth: 1,
   },
-  unread: { borderLeftWidth: 4, borderLeftColor: '#2563eb' },
+  unread: { borderLeftWidth: 4, borderLeftColor: '#3b82f6' },
   typeBadge: { alignSelf: 'flex-start', borderRadius: 8, paddingHorizontal: 8, paddingVertical: 2 },
   typeText: { fontSize: 10, fontWeight: '600' },
   title: { fontSize: 15, fontWeight: '600', marginTop: 8 },
