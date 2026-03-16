@@ -3,6 +3,8 @@
 Full-stack portfolio project for a fictional regional electricity provider. Demonstrates senior-level engineering across a TypeScript monorepo: production-pattern RESTful API, responsive web portal, cross-platform mobile app, and shared code infrastructure.
 
 ## Web App
+![Admin View](docs/screenshots/login-web.png)
+*Login Screen*
 
 ![Admin View](docs/screenshots/web-admin.png)
 *Admin*
