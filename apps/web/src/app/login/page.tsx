@@ -12,6 +12,8 @@ export default function LoginPage() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [selectedDemo, setSelectedDemo] = useState<string | null>(null);
+  const [demoPassword, setDemoPassword] = useState('');
   const { setAuth } = useAuth();
   const router = useRouter();
 
@@ -37,7 +39,7 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      const res = await login(demoEmail, 'password-123');
+      const res = await login(demoEmail, demoPassword);
       setAuth(res.data.token, res.data.user);
       const isStaff = res.data.user.role === 'ADMIN' || res.data.user.role === 'TECHNICIAN';
       router.push(isStaff ? '/outages' : '/dashboard');
@@ -133,14 +135,40 @@ export default function LoginPage() {
               ].map((u) => (
                 <button
                   key={u.email}
-                  onClick={() => handleDemoLogin(u.email)}
+                  type="button"
+                  onClick={() => { setSelectedDemo(u.email); setDemoPassword(''); setError(''); }}
                   disabled={loading}
-                  className="flex-1 py-1.5 px-3 text-xs font-medium rounded-md border border-zinc-700 text-zinc-400 hover:bg-zinc-800 disabled:opacity-50"
+                  className={`flex-1 py-1.5 px-3 text-xs font-medium rounded-md border disabled:opacity-50 ${
+                    selectedDemo === u.email
+                      ? 'border-blue-500 text-blue-400 bg-blue-950/30'
+                      : 'border-zinc-700 text-zinc-400 hover:bg-zinc-800'
+                  }`}
                 >
                   {u.label}
                 </button>
               ))}
             </div>
+            {selectedDemo && (
+              <div className="mt-3 flex gap-2">
+                <input
+                  type="password"
+                  value={demoPassword}
+                  onChange={(e) => setDemoPassword(e.target.value)}
+                  placeholder="Enter password"
+                  onKeyDown={(e) => { if (e.key === 'Enter' && demoPassword) handleDemoLogin(selectedDemo); }}
+                  className="flex-1 px-3 py-1.5 text-xs bg-zinc-900 border border-zinc-700 rounded-md text-zinc-100 placeholder-zinc-600 focus:border-blue-500 focus:ring-1 focus:ring-blue-500/50 outline-none"
+                  autoFocus
+                />
+                <button
+                  type="button"
+                  onClick={() => handleDemoLogin(selectedDemo)}
+                  disabled={loading || !demoPassword}
+                  className="px-3 py-1.5 text-xs font-semibold bg-zinc-50 text-zinc-950 rounded-md hover:bg-zinc-200 disabled:opacity-50"
+                >
+                  Go
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </div>
