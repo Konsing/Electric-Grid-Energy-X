@@ -10,6 +10,8 @@ export default function LoginScreen() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const [selectedDemo, setSelectedDemo] = useState<string | null>(null);
+  const [demoPassword, setDemoPassword] = useState('');
   const { setAuth } = useAuth();
   const { colors, isDark, toggleTheme } = useTheme();
   const router = useRouter();
@@ -29,9 +31,13 @@ export default function LoginScreen() {
   };
 
   const handleDemoLogin = async (demoEmail: string) => {
+    if (!demoPassword) {
+      Alert.alert('Error', 'Please enter the demo password');
+      return;
+    }
     setLoading(true);
     try {
-      const res = await login(demoEmail, 'password-123');
+      const res = await login(demoEmail, demoPassword);
       await setAuth(res.data.token, res.data.user);
       const isStaff = res.data.user.role === 'ADMIN' || res.data.user.role === 'TECHNICIAN';
       router.replace(isStaff ? '/(tabs)/outages' : '/(tabs)/dashboard');
@@ -84,14 +90,38 @@ export default function LoginScreen() {
           ].map((u) => (
             <TouchableOpacity
               key={u.email}
-              style={[styles.devButton, { borderColor: colors.devButtonBorder }]}
-              onPress={() => handleDemoLogin(u.email)}
+              style={[
+                styles.devButton,
+                { borderColor: selectedDemo === u.email ? colors.brand : colors.devButtonBorder },
+                selectedDemo === u.email && { backgroundColor: colors.brand + '15' },
+              ]}
+              onPress={() => { setSelectedDemo(u.email); setDemoPassword(''); }}
               disabled={loading}
             >
-              <Text style={[styles.devButtonText, { color: colors.devButtonText }]}>{u.label}</Text>
+              <Text style={[styles.devButtonText, { color: selectedDemo === u.email ? colors.brand : colors.devButtonText }]}>{u.label}</Text>
             </TouchableOpacity>
           ))}
         </View>
+        {selectedDemo && (
+          <View style={styles.demoPasswordRow}>
+            <TextInput
+              style={[styles.demoPasswordInput, { backgroundColor: colors.inputBg, borderColor: colors.inputBorder, color: colors.text }]}
+              placeholder="Enter password"
+              placeholderTextColor={colors.textTertiary}
+              value={demoPassword}
+              onChangeText={setDemoPassword}
+              secureTextEntry
+              autoFocus
+            />
+            <TouchableOpacity
+              style={[styles.demoGoButton, { backgroundColor: colors.brand, opacity: loading || !demoPassword ? 0.5 : 1 }]}
+              onPress={() => handleDemoLogin(selectedDemo)}
+              disabled={loading || !demoPassword}
+            >
+              <Text style={styles.demoGoText}>Go</Text>
+            </TouchableOpacity>
+          </View>
+        )}
       </View>
     </ScrollView>
   );
@@ -121,4 +151,12 @@ const styles = StyleSheet.create({
     flex: 1, borderWidth: 1, borderRadius: 8, padding: 10, alignItems: 'center',
   },
   devButtonText: { fontSize: 12, fontWeight: '500' },
+  demoPasswordRow: { flexDirection: 'row', gap: 8, marginTop: 12 },
+  demoPasswordInput: {
+    flex: 1, borderWidth: 1, borderRadius: 8, padding: 10, fontSize: 14,
+  },
+  demoGoButton: {
+    borderRadius: 8, paddingHorizontal: 16, justifyContent: 'center', alignItems: 'center',
+  },
+  demoGoText: { color: '#fff', fontSize: 14, fontWeight: '600' },
 });
