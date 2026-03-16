@@ -6,6 +6,7 @@
     "orientation": "portrait",
     "scheme": "egx",
     "userInterfaceStyle": "dark",
+    "backgroundColor": "#09090b",
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
