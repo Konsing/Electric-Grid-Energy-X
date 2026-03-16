@@ -4,7 +4,7 @@ import { useRouter } from 'expo-router';
 import { Feather } from '@expo/vector-icons';
 import { useAuth } from '../src/lib/auth-context';
 import { useTheme } from '../src/lib/theme-context';
-import { login, devLogin } from '../src/lib/api';
+import { login } from '../src/lib/api';
 
 export default function LoginScreen() {
   const [email, setEmail] = useState('');
@@ -28,10 +28,10 @@ export default function LoginScreen() {
     }
   };
 
-  const handleDevLogin = async (devEmail: string) => {
+  const handleDemoLogin = async (demoEmail: string) => {
     setLoading(true);
     try {
-      const res = await devLogin(devEmail);
+      const res = await login(demoEmail, 'password-123');
       await setAuth(res.data.token, res.data.user);
       const isStaff = res.data.user.role === 'ADMIN' || res.data.user.role === 'TECHNICIAN';
       router.replace(isStaff ? '/(tabs)/outages' : '/(tabs)/dashboard');
@@ -85,7 +85,7 @@ export default function LoginScreen() {
             <TouchableOpacity
               key={u.email}
               style={[styles.devButton, { borderColor: colors.devButtonBorder }]}
-              onPress={() => handleDevLogin(u.email)}
+              onPress={() => handleDemoLogin(u.email)}
               disabled={loading}
             >
               <Text style={[styles.devButtonText, { color: colors.devButtonText }]}>{u.label}</Text>

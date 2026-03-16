@@ -2,7 +2,7 @@ import { PrismaClient, Role } from '@prisma/client';
 import bcrypt from 'bcryptjs';
 import { v4 as uuid } from 'uuid';
 
-const PASSWORD = 'password123';
+const PASSWORD = 'password-123';
 const PASSWORD_HASH_PROMISE = bcrypt.hash(PASSWORD, 10);
 
 export interface TestFixtures {
