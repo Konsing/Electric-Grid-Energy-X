@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, ScrollView, KeyboardAvoidingView, Platform, ImageBackground } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import { useAuth } from '../src/lib/auth-context';
 import { useTheme } from '../src/lib/theme-context';
@@ -48,83 +49,87 @@ export default function LoginScreen() {
   };
 
   return (
-    <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
-      <ScrollView contentContainerStyle={[styles.container, { backgroundColor: colors.background }]} keyboardShouldPersistTaps="handled">
-        <Text style={[styles.title, { color: colors.brand }]}>Electric Grid Energy X</Text>
-        <Text style={[styles.subtitle, { color: colors.textSecondary }]}>Sign in to your account</Text>
+    <ImageBackground source={require('../assets/background.png')} style={styles.bgImage} resizeMode="cover">
+      <LinearGradient colors={['rgba(9,9,11,0.6)', 'rgba(9,9,11,0.95)']} style={StyleSheet.absoluteFill} />
+      <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+        <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
+          <Text style={[styles.title, { color: colors.brand }]}>Electric Grid Energy X</Text>
+          <Text style={[styles.subtitle, { color: colors.textSecondary }]}>Sign in to your account</Text>
 
-        <View style={styles.form}>
-          <TextInput
-            style={[styles.input, { backgroundColor: colors.inputBg, borderColor: colors.inputBorder, color: colors.text }]}
-            placeholder="Email"
-            placeholderTextColor={colors.textTertiary}
-            value={email}
-            onChangeText={setEmail}
-            autoCapitalize="none"
-            keyboardType="email-address"
-          />
-          <TextInput
-            style={[styles.input, { backgroundColor: colors.inputBg, borderColor: colors.inputBorder, color: colors.text }]}
-            placeholder="Password"
-            placeholderTextColor={colors.textTertiary}
-            value={password}
-            onChangeText={setPassword}
-            secureTextEntry
-          />
-          <TouchableOpacity style={[styles.button, { backgroundColor: colors.text }]} onPress={handleLogin} disabled={loading}>
-            <Text style={[styles.buttonText, { color: colors.background }]}>{loading ? 'Signing in...' : 'Sign In'}</Text>
-          </TouchableOpacity>
-        </View>
-
-        <View style={[styles.devSection, { backgroundColor: colors.devSectionBg, borderColor: colors.devSectionBorder }]}>
-          <Text style={[styles.devTitle, { color: colors.devTitle }]}>Demo Accounts</Text>
-          <View style={styles.devButtons}>
-            {[
-              { email: 'admin@egx.dev', label: 'Admin' },
-              { email: 'tech@egx.dev', label: 'Tech' },
-              { email: 'customer@egx.dev', label: 'Customer' },
-            ].map((u) => (
-              <TouchableOpacity
-                key={u.email}
-                style={[
-                  styles.devButton,
-                  { borderColor: selectedDemo === u.email ? colors.brand : colors.devButtonBorder },
-                  selectedDemo === u.email && { backgroundColor: colors.brand + '15' },
-                ]}
-                onPress={() => { setSelectedDemo(u.email); setDemoPassword(''); }}
-                disabled={loading}
-              >
-                <Text style={[styles.devButtonText, { color: selectedDemo === u.email ? colors.brand : colors.devButtonText }]}>{u.label}</Text>
-              </TouchableOpacity>
-            ))}
+          <View style={styles.form}>
+            <TextInput
+              style={[styles.input, { backgroundColor: colors.inputBg, borderColor: colors.inputBorder, color: colors.text }]}
+              placeholder="Email"
+              placeholderTextColor={colors.textTertiary}
+              value={email}
+              onChangeText={setEmail}
+              autoCapitalize="none"
+              keyboardType="email-address"
+            />
+            <TextInput
+              style={[styles.input, { backgroundColor: colors.inputBg, borderColor: colors.inputBorder, color: colors.text }]}
+              placeholder="Password"
+              placeholderTextColor={colors.textTertiary}
+              value={password}
+              onChangeText={setPassword}
+              secureTextEntry
+            />
+            <TouchableOpacity style={[styles.button, { backgroundColor: colors.text }]} onPress={handleLogin} disabled={loading}>
+              <Text style={[styles.buttonText, { color: colors.background }]}>{loading ? 'Signing in...' : 'Sign In'}</Text>
+            </TouchableOpacity>
           </View>
-          {selectedDemo && (
-            <View style={styles.demoPasswordRow}>
-              <TextInput
-                style={[styles.demoPasswordInput, { backgroundColor: colors.inputBg, borderColor: colors.inputBorder, color: colors.text }]}
-                placeholder="Enter password"
-                placeholderTextColor={colors.textTertiary}
-                value={demoPassword}
-                onChangeText={setDemoPassword}
-                secureTextEntry
-                autoFocus
-              />
-              <TouchableOpacity
-                style={[styles.demoGoButton, { backgroundColor: colors.text, opacity: loading || !demoPassword ? 0.5 : 1 }]}
-                onPress={() => handleDemoLogin(selectedDemo)}
-                disabled={loading || !demoPassword}
-              >
-                <Text style={[styles.demoGoText, { color: colors.background }]}>Go</Text>
-              </TouchableOpacity>
+
+          <View style={[styles.devSection, { backgroundColor: colors.devSectionBg, borderColor: colors.devSectionBorder }]}>
+            <Text style={[styles.devTitle, { color: colors.devTitle }]}>Demo Accounts</Text>
+            <View style={styles.devButtons}>
+              {[
+                { email: 'admin@egx.dev', label: 'Admin' },
+                { email: 'tech@egx.dev', label: 'Tech' },
+                { email: 'customer@egx.dev', label: 'Customer' },
+              ].map((u) => (
+                <TouchableOpacity
+                  key={u.email}
+                  style={[
+                    styles.devButton,
+                    { borderColor: selectedDemo === u.email ? colors.brand : colors.devButtonBorder },
+                    selectedDemo === u.email && { backgroundColor: colors.brand + '15' },
+                  ]}
+                  onPress={() => { setSelectedDemo(u.email); setDemoPassword(''); }}
+                  disabled={loading}
+                >
+                  <Text style={[styles.devButtonText, { color: selectedDemo === u.email ? colors.brand : colors.devButtonText }]}>{u.label}</Text>
+                </TouchableOpacity>
+              ))}
             </View>
-          )}
-        </View>
-      </ScrollView>
-    </KeyboardAvoidingView>
+            {selectedDemo && (
+              <View style={styles.demoPasswordRow}>
+                <TextInput
+                  style={[styles.demoPasswordInput, { backgroundColor: colors.inputBg, borderColor: colors.inputBorder, color: colors.text }]}
+                  placeholder="Enter password"
+                  placeholderTextColor={colors.textTertiary}
+                  value={demoPassword}
+                  onChangeText={setDemoPassword}
+                  secureTextEntry
+                  autoFocus
+                />
+                <TouchableOpacity
+                  style={[styles.demoGoButton, { backgroundColor: colors.text, opacity: loading || !demoPassword ? 0.5 : 1 }]}
+                  onPress={() => handleDemoLogin(selectedDemo)}
+                  disabled={loading || !demoPassword}
+                >
+                  <Text style={[styles.demoGoText, { color: colors.background }]}>Go</Text>
+                </TouchableOpacity>
+              </View>
+            )}
+          </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </ImageBackground>
   );
 }
 
 const styles = StyleSheet.create({
+  bgImage: { flex: 1 },
   container: { flexGrow: 1, justifyContent: 'center', padding: 24 },
   title: { fontSize: 28, fontWeight: 'bold', textAlign: 'center' },
   subtitle: { fontSize: 16, textAlign: 'center', marginTop: 8, marginBottom: 32 },
