@@ -6,7 +6,7 @@ import { Providers } from './providers';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'Electric Grid Energy X',
+  title: 'EGX',
   description: 'Your energy management portal',
 };
 
