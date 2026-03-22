@@ -129,21 +129,23 @@ export default function DashboardScreen() {
         <View style={styles.section}>
           <Text style={[styles.sectionTitle, { color: colors.text }]}>Energy Usage</Text>
           <View style={[styles.chartCard, { backgroundColor: colors.surface, borderColor: colors.surfaceBorder }]}>
-            <LineChart
-              data={{
-                labels: usageLabels.length > 6 ? usageLabels.filter((_: any, i: number) => i % 2 === 0) : usageLabels,
-                datasets: [{ data: usageValues.length > 0 ? usageValues : [0] }],
-              }}
-              width={chartWidth}
-              height={200}
-              chartConfig={chartConfig}
-              bezier
-              style={styles.chart}
-              withInnerLines
-              withOuterLines={false}
-              yAxisSuffix=""
-              yAxisLabel=""
-            />
+            <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+              <LineChart
+                data={{
+                  labels: usageLabels,
+                  datasets: [{ data: usageValues.length > 0 ? usageValues : [0] }],
+                }}
+                width={Math.max(chartWidth, usageLabels.length * 50)}
+                height={200}
+                chartConfig={chartConfig}
+                bezier
+                style={styles.chart}
+                withInnerLines
+                withOuterLines={false}
+                yAxisSuffix=""
+                yAxisLabel=""
+              />
+            </ScrollView>
           </View>
         </View>
       )}
@@ -153,19 +155,21 @@ export default function DashboardScreen() {
         <View style={styles.section}>
           <Text style={[styles.sectionTitle, { color: colors.text }]}>Monthly Cost</Text>
           <View style={[styles.chartCard, { backgroundColor: colors.surface, borderColor: colors.surfaceBorder }]}>
-            <BarChart
-              data={{
-                labels: costLabels,
-                datasets: [{ data: costValues.length > 0 ? costValues : [0] }],
-              }}
-              width={chartWidth}
-              height={200}
-              chartConfig={costChartConfig}
-              style={styles.chart}
-              withInnerLines
-              yAxisSuffix=""
-              yAxisLabel="$"
-            />
+            <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+              <BarChart
+                data={{
+                  labels: costLabels,
+                  datasets: [{ data: costValues.length > 0 ? costValues : [0] }],
+                }}
+                width={Math.max(chartWidth, costLabels.length * 50)}
+                height={200}
+                chartConfig={costChartConfig}
+                style={styles.chart}
+                withInnerLines
+                yAxisSuffix=""
+                yAxisLabel="$"
+              />
+            </ScrollView>
           </View>
         </View>
       )}
