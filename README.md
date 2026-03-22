@@ -28,7 +28,27 @@ Full-stack portfolio project for a fictional regional electricity provider. Demo
   <em>Login (furthest left) &nbsp;&nbsp;|&nbsp;&nbsp; Customer (left two) &nbsp;&nbsp;|&nbsp;&nbsp; Admin (right two)</em>
 </p>
 
-Dashboard charts (energy usage and monthly cost) are horizontally scrollable on mobile, showing the full 12-month history.
+## Dashboard
+
+Both web and mobile dashboards display interactive charts alongside key stats:
+
+- **Energy Usage** — 12-month area chart (web) / line chart (mobile) showing kWh consumption with seasonal patterns
+- **Monthly Cost** — 12-month bar chart showing billing amounts calculated with tiered energy pricing ($0.08–$0.15/kWh across three tiers)
+- **Trend Indicator** — percentage change vs last month (green = decreased, red = increased)
+- **Stats Cards** — current month usage, monthly average, 12-month total, and active outage count
+
+Charts on mobile are horizontally scrollable, showing the full 12-month history. Billing amounts are derived directly from actual meter readings using the shared `calculateEnergyCost` utility, so usage and cost charts always correlate.
+
+## Live Data Simulation
+
+A GitHub Actions cron job runs on the 1st of each month to generate realistic new data, keeping the live demo fresh without manual intervention:
+
+- **Daily meter readings** — 30 readings per meter with seasonal variation (higher in summer/winter, lower in spring/fall)
+- **Billing cycles** — automatically generated from that month's readings using tiered energy pricing
+- **Notifications** — billing alerts sent to customer accounts when new bills are created
+- **Outages** — 1–2 realistic outage events created and resolved each month from a rotating template pool
+
+The simulation is triggered via `POST /api/simulate`, protected by a bearer token (`SIMULATION_SECRET`). It can also be triggered manually from the GitHub Actions tab via `workflow_dispatch`.
 
 ## Live Demo
 
@@ -175,6 +195,7 @@ git push origin main
 | **API** | Push to `main` | Render auto-builds from Dockerfile |
 | **Mobile App** | Push to `main` (changes in `apps/mobile/` or `packages/shared/`) | GitHub Actions → `eas update` OTA push |
 | **Database** | Push to `main` (schema changes) | Prisma migrations run on Render during build |
+| **Simulation** | 1st of each month (cron) | GitHub Actions → `POST /api/simulate` generates new monthly data |
 
 ### Database Schema Changes
 
