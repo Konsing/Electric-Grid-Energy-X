@@ -1,0 +1,35 @@
+name: Monthly Data Simulation
+
+on:
+  schedule:
+    # Runs at 6 AM UTC on the 1st of every month
+    - cron: '0 6 1 * *'
+  workflow_dispatch: # Allow manual trigger
+
+jobs:
+  simulate:
+    name: Generate Monthly Data
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Trigger simulation endpoint
+        env:
+          API_URL: ${{ secrets.API_URL }}
+          SIMULATION_SECRET: ${{ secrets.SIMULATION_SECRET }}
+        run: |
+          echo "Triggering monthly simulation..."
+          response=$(curl -s -w "\n%{http_code}" \
+            -X POST "${API_URL}/api/simulate" \
+            -H "Authorization: Bearer ${SIMULATION_SECRET}" \
+            -H "Content-Type: application/json")
+
+          http_code=$(echo "$response" | tail -1)
+          body=$(echo "$response" | head -n -1)
+
+          echo "Status: $http_code"
+          echo "Response: $body"
+
+          if [ "$http_code" != "200" ]; then
+            echo "Simulation failed with status $http_code"
+            exit 1
+          fi
