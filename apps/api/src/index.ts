@@ -14,6 +14,7 @@ import { readingsRouter } from './modules/readings/readings.routes';
 import { billingRouter } from './modules/billing/billing.routes';
 import { notificationsRouter } from './modules/notifications/notifications.routes';
 import { outagesRouter } from './modules/outages/outages.routes';
+import { simulationRouter } from './modules/simulation/simulation.routes';
 
 export function createApp() {
   const app = express();
@@ -54,6 +55,7 @@ export function createApp() {
   app.use('/api/notifications', notificationsRouter);
   app.use('/api/accounts', notificationsRouter); // /api/accounts/:id/notifications
   app.use('/api/outages', outagesRouter);
+  app.use('/api', simulationRouter);
 
   // ─── Error Handler ──────────────────────────────────
   app.use(errorHandler);

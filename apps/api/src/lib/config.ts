@@ -13,6 +13,7 @@ const envSchema = z.object({
     .string()
     .transform((v) => v === 'true' || v === '1')
     .default('false'),
+  SIMULATION_SECRET: z.string().optional(),
   FIREBASE_PROJECT_ID: z.string().optional(),
   FIREBASE_CLIENT_EMAIL: z.string().optional(),
   FIREBASE_PRIVATE_KEY: z.string().optional(),
