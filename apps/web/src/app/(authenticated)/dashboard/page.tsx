@@ -42,7 +42,7 @@ export default function DashboardPage() {
 
   // Prepare chart data
   const usageData = analytics?.months?.map((m: any) => ({
-    month: m.month ? new Date(m.month).toLocaleString('default', { month: 'short' }) : '',
+    month: m.month ? new Date(m.month).toLocaleString('default', { month: 'short', timeZone: 'UTC' }) : '',
     kwh: Math.round(m.kwh),
     cost: m.cost,
   })) || [];
@@ -50,7 +50,7 @@ export default function DashboardPage() {
   const billingData = [...bills]
     .reverse()
     .map((b: any) => ({
-      period: new Date(b.startDate).toLocaleString('default', { month: 'short' }),
+      period: new Date(b.startDate).toLocaleString('default', { month: 'short', timeZone: 'UTC' }),
       amount: b.amountDue,
       status: b.status,
     }));

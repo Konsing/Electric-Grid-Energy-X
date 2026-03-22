@@ -49,13 +49,13 @@ export default function DashboardScreen() {
   // Chart data
   const months = analytics?.months || [];
   const usageLabels = months.map((m: any) =>
-    m.month ? new Date(m.month).toLocaleString('default', { month: 'short' }) : ''
+    m.month ? new Date(m.month).toLocaleString('default', { month: 'short', timeZone: 'UTC' }) : ''
   );
   const usageValues = months.map((m: any) => Math.round(m.kwh || 0));
 
   const billingReversed = [...bills].reverse();
   const costLabels = billingReversed.map((b: any) =>
-    new Date(b.startDate).toLocaleString('default', { month: 'short' })
+    new Date(b.startDate).toLocaleString('default', { month: 'short', timeZone: 'UTC' })
   );
   const costValues = billingReversed.map((b: any) => b.amountDue || 0);
 
