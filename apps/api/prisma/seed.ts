@@ -576,26 +576,14 @@ async function main() {
     }
   }
 
-  // Jane Doe — 8 months of billing
-  await createBillingFromReadings(custAccount.id, 8);
-
-  // John Smith — 6 months
-  await createBillingFromReadings(cust2Account.id, 6);
-
-  // Lisa Chen — 10 months, clean history
-  await createBillingFromReadings(cust3Account.id, 10);
-
-  // Marcus Johnson — 8 months, one overdue
-  await createBillingFromReadings(cust4Account.id, 8, { overdueMonth: 2 });
-
-  // Sarah Williams — 4 months (suspended)
-  await createBillingFromReadings(cust5Account.id, 4, { overdueMonth: 1 });
-
-  // David Kim — 6 months
-  await createBillingFromReadings(cust6Account.id, 6);
-
-  // Rachel Torres — 8 months
-  await createBillingFromReadings(cust7Account.id, 8);
+  // All accounts: 12 months of billing derived from their readings
+  await createBillingFromReadings(custAccount.id, 12);
+  await createBillingFromReadings(cust2Account.id, 12);
+  await createBillingFromReadings(cust3Account.id, 12);
+  await createBillingFromReadings(cust4Account.id, 12, { overdueMonth: 2 });
+  await createBillingFromReadings(cust5Account.id, 12, { overdueMonth: 1 });
+  await createBillingFromReadings(cust6Account.id, 12);
+  await createBillingFromReadings(cust7Account.id, 12);
 
   // ─── Notifications ────────────────────────────────
 
