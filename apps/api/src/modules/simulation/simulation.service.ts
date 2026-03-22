@@ -4,8 +4,8 @@ import { calculateEnergyCost } from '@egx/shared';
 
 const prisma = new PrismaClient();
 
-// Demo account emails — only these get simulated data
-const DEMO_EMAILS = ['admin@egx.dev', 'tech@egx.dev', 'customer@egx.dev'];
+// Only the customer demo account gets simulated data
+const DEMO_EMAILS = ['customer@egx.dev'];
 
 // Seasonal multipliers by month index (0=Jan, 11=Dec)
 // Higher in summer (AC) and winter (heating), lower in spring/fall
@@ -102,9 +102,8 @@ export async function runMonthlySimulation() {
   // ─── Generate Daily Meter Readings ───────────────────
   for (const account of demoAccounts) {
     for (const meter of account.meters) {
-      // Base daily usage varies by account type
-      // Admin/Tech have office-like usage (~15 kWh/day), Customer has residential (~20 kWh/day)
-      const baseDaily = account.user.email === 'customer@egx.dev' ? 20 : 15;
+      // Residential usage ~20 kWh/day base
+      const baseDaily = 20;
 
       const readingsData = [];
       for (let day = 1; day <= daysInMonth; day++) {

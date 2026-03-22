@@ -37,44 +37,58 @@ export default function OutagesScreen() {
     }
   };
 
+  const active = outages.filter((o: any) => o.status !== 'RESOLVED');
+  const resolved = outages.filter((o: any) => o.status === 'RESOLVED');
+
+  const renderCard = (o: any) => (
+    <View key={o.id} style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.surfaceBorder }]}>
+      <View style={styles.header}>
+        <Text style={[styles.title, { color: colors.text }]}>{o.title}</Text>
+        <View style={styles.badges}>
+          <View style={[styles.badge, { backgroundColor: severityColor(o.severity) + '20' }]}>
+            <Text style={[styles.badgeText, { color: severityColor(o.severity) }]}>
+              {o.severity}
+            </Text>
+          </View>
+          <View style={[styles.badge, { backgroundColor: statusColor(o.status) + '20' }]}>
+            <Text style={[styles.badgeText, { color: statusColor(o.status) }]}>
+              {o.status}
+            </Text>
+          </View>
+        </View>
+      </View>
+      <Text style={[styles.area, { color: colors.textSecondary }]}>{o.affectedArea}</Text>
+      <Text style={[styles.desc, { color: colors.textMuted }]}>{o.description}</Text>
+      <Text style={[styles.time, { color: colors.textTertiary }]}>Started: {new Date(o.startedAt).toLocaleString()}</Text>
+      {o.estimatedResolution && (
+        <Text style={[styles.time, { color: colors.textTertiary }]}>Est. Resolution: {new Date(o.estimatedResolution).toLocaleString()}</Text>
+      )}
+      {o.resolvedAt && (
+        <Text style={[styles.time, { color: colors.success }]}>Resolved: {new Date(o.resolvedAt).toLocaleString()}</Text>
+      )}
+    </View>
+  );
+
   return (
     <ScrollView
       style={[styles.container, { backgroundColor: colors.background }]}
       refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
     >
-      {outages.map((o: any) => (
-        <View key={o.id} style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.surfaceBorder }]}>
-          <View style={styles.header}>
-            <Text style={[styles.title, { color: colors.text }]}>{o.title}</Text>
-            <View style={styles.badges}>
-              <View style={[styles.badge, { backgroundColor: severityColor(o.severity) + '20' }]}>
-                <Text style={[styles.badgeText, { color: severityColor(o.severity) }]}>
-                  {o.severity}
-                </Text>
-              </View>
-              <View style={[styles.badge, { backgroundColor: statusColor(o.status) + '20' }]}>
-                <Text style={[styles.badgeText, { color: statusColor(o.status) }]}>
-                  {o.status}
-                </Text>
-              </View>
-            </View>
-          </View>
-          <Text style={[styles.area, { color: colors.textSecondary }]}>{o.affectedArea}</Text>
-          <Text style={[styles.desc, { color: colors.textMuted }]}>{o.description}</Text>
-          <Text style={[styles.time, { color: colors.textTertiary }]}>Started: {new Date(o.startedAt).toLocaleString()}</Text>
-          {o.estimatedResolution && (
-            <Text style={[styles.time, { color: colors.textTertiary }]}>Est. Resolution: {new Date(o.estimatedResolution).toLocaleString()}</Text>
-          )}
-          {o.resolvedAt && (
-            <Text style={[styles.time, { color: colors.success }]}>Resolved: {new Date(o.resolvedAt).toLocaleString()}</Text>
-          )}
-        </View>
-      ))}
-      {outages.length === 0 && (
+      {active.map(renderCard)}
+      {active.length === 0 && (
         <View style={styles.emptyContainer}>
           <Feather name="check-circle" size={40} color={colors.success} style={{ marginBottom: 12 }} />
-          <Text style={[styles.emptyText, { color: colors.success }]}>No outages reported</Text>
+          <Text style={[styles.emptyText, { color: colors.success }]}>No active outages</Text>
         </View>
+      )}
+
+      {resolved.length > 0 && (
+        <>
+          <View style={[styles.sectionDivider, { borderTopColor: colors.surfaceBorder }]}>
+            <Text style={[styles.sectionTitle, { color: colors.textSecondary }]}>History</Text>
+          </View>
+          {resolved.map(renderCard)}
+        </>
       )}
     </ScrollView>
   );
@@ -94,6 +108,8 @@ const styles = StyleSheet.create({
   area: { fontSize: 13, marginTop: 6 },
   desc: { fontSize: 13, marginTop: 8 },
   time: { fontSize: 11, marginTop: 6 },
+  sectionDivider: { borderTopWidth: 1, paddingTop: 16, marginTop: 8, marginBottom: 4 },
+  sectionTitle: { fontSize: 16, fontWeight: '600', marginBottom: 12 },
   emptyContainer: { alignItems: 'center', marginTop: 60 },
   emptyText: { fontSize: 16, fontWeight: '500' },
 });
