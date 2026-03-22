@@ -9,24 +9,26 @@ Full-stack portfolio project for a fictional regional electricity provider. Demo
 ![Admin View](docs/screenshots/web-admin.png)
 *Admin*
 
-![Technician View](docs/screenshots/web-tech.png)
+![Technician View](docs/screenshots/web-tech-v2.png)
 *Technician*
 
-![Customer View](docs/screenshots/web-customer.png)
+![Customer View](docs/screenshots/web-customer-v2.png)
 *Customer*
 
 ## Mobile App
 
 <p align="center">
   <img src="docs/screenshots/mobile-login.png?v=2" alt="Mobile Login" width="19%" />
-  <img src="docs/screenshots/mobile-customer-1.png?v=2" alt="Mobile Customer View 1" width="19%" />
-  <img src="docs/screenshots/mobile-customer-2.png?v=2" alt="Mobile Customer View 2" width="19%" />
-  <img src="docs/screenshots/mobile-admin-1.png?v=2" alt="Mobile Admin View 1" width="19%" />
+  <img src="docs/screenshots/mobile-customer-home.png?v=2" alt="Mobile Customer View 1" width="19%" />
+  <img src="docs/screenshots/mobile-customer-billing.png?v=2" alt="Mobile Customer View 2" width="19%" />
+  <img src="docs/screenshots/mobile-admin-outages.png?v=2" alt="Mobile Admin View 1" width="19%" />
   <img src="docs/screenshots/mobile-admin-2.png?v=2" alt="Mobile Admin View 2" width="19%" />
 </p>
 <p align="center">
   <em>Login (furthest left) &nbsp;&nbsp;|&nbsp;&nbsp; Customer (left two) &nbsp;&nbsp;|&nbsp;&nbsp; Admin (right two)</em>
 </p>
+
+Dashboard charts (energy usage and monthly cost) are horizontally scrollable on mobile, showing the full 12-month history.
 
 ## Live Demo
 
