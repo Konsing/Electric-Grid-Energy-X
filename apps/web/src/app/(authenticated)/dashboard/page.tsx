@@ -4,6 +4,10 @@ import { useEffect, useState } from 'react';
 import { useAuth } from '@/lib/auth-context';
 import { getUsageSummary, getUsageAnalytics, getAccountBilling, getActiveOutages } from '@/lib/api';
 import { formatCurrency, formatKwh } from '@egx/shared';
+import {
+  AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid,
+  Tooltip, ResponsiveContainer,
+} from 'recharts';
 
 export default function DashboardPage() {
   const { user, token } = useAuth();
@@ -36,6 +40,30 @@ export default function DashboardPage() {
     return <div className="text-zinc-500">Loading dashboard...</div>;
   }
 
+  // Prepare chart data
+  const usageData = analytics?.months?.map((m: any) => ({
+    month: m.month ? new Date(m.month).toLocaleString('default', { month: 'short' }) : '',
+    kwh: Math.round(m.kwh),
+    cost: m.cost,
+  })) || [];
+
+  const billingData = [...bills]
+    .reverse()
+    .slice(-8)
+    .map((b: any) => ({
+      period: new Date(b.startDate).toLocaleString('default', { month: 'short' }),
+      amount: b.amountDue,
+      status: b.status,
+    }));
+
+  const trend = usage?.trend;
+  const trendLabel = trend != null
+    ? `${trend > 0 ? '+' : ''}${trend.toFixed(1)}%`
+    : null;
+  const trendColor = trend != null
+    ? (trend > 0 ? 'text-red-400' : 'text-green-400')
+    : '';
+
   return (
     <div className="space-y-8">
       <div>
@@ -48,12 +76,15 @@ export default function DashboardPage() {
       {/* Stats */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         <div className="bg-zinc-900 p-6 rounded-lg border border-zinc-800">
-          <p className="text-xs uppercase tracking-wide text-zinc-500">Current Month Usage</p>
+          <p className="text-xs uppercase tracking-wide text-zinc-500">Current Month</p>
           <p className="mt-1 text-3xl font-extrabold tracking-tight text-zinc-50">
             {usage?.currentMonth ? (
               <>{usage.currentMonth.toFixed(0)} <span className="text-sm text-zinc-500 font-normal">kWh</span></>
             ) : '--'}
           </p>
+          {trendLabel && (
+            <p className={`text-xs mt-1 ${trendColor}`}>{trendLabel} vs last month</p>
+          )}
         </div>
         <div className="bg-zinc-900 p-6 rounded-lg border border-zinc-800">
           <p className="text-xs uppercase tracking-wide text-zinc-500">Monthly Average</p>
@@ -77,35 +108,50 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {/* Usage Chart */}
-      {analytics?.months && analytics.months.length > 0 && (
+      {/* Usage Area Chart */}
+      {usageData.length > 0 && (
         <div className="bg-zinc-900 p-6 rounded-lg border border-zinc-800">
-          <h2 className="font-bold tracking-tight text-zinc-50 mb-4">Monthly Usage</h2>
-          <div className="flex items-end gap-2">
-            {(() => {
-              const maxKwh = Math.max(...analytics.months.map((m: any) => m.kwh), 1);
-              const lastIndex = analytics.months.length - 1;
-              return analytics.months.map((month: any, i: number) => {
-                const heightPx = maxKwh > 0 ? (month.kwh / maxKwh) * 180 : 0;
-                const isCurrent = i === lastIndex;
-                const label = month.month
-                  ? new Date(month.month).toLocaleString('default', { month: 'short' })
-                  : `M${i + 1}`;
-                return (
-                  <div key={i} className="flex-1 flex flex-col items-center gap-1">
-                    <span className="text-xs text-zinc-500">{formatKwh(month.kwh)}</span>
-                    <div className="w-full flex items-end" style={{ height: '180px' }}>
-                      <div
-                        className={`w-full rounded-t ${isCurrent ? 'bg-blue-500 border border-blue-400' : 'bg-blue-500'}`}
-                        style={{ height: `${Math.max(heightPx, 4)}px` }}
-                      />
-                    </div>
-                    <span className={`text-xs ${isCurrent ? 'text-zinc-50 font-semibold' : 'text-zinc-500'}`}>{label}</span>
-                  </div>
-                );
-              });
-            })()}
-          </div>
+          <h2 className="font-bold tracking-tight text-zinc-50 mb-6">Energy Usage</h2>
+          <ResponsiveContainer width="100%" height={280}>
+            <AreaChart data={usageData} margin={{ top: 5, right: 20, bottom: 5, left: 0 }}>
+              <defs>
+                <linearGradient id="usageGradient" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.3} />
+                  <stop offset="95%" stopColor="#3b82f6" stopOpacity={0} />
+                </linearGradient>
+              </defs>
+              <CartesianGrid strokeDasharray="3 3" stroke="#27272a" />
+              <XAxis dataKey="month" tick={{ fill: '#71717a', fontSize: 12 }} axisLine={{ stroke: '#27272a' }} tickLine={false} />
+              <YAxis tick={{ fill: '#71717a', fontSize: 12 }} axisLine={{ stroke: '#27272a' }} tickLine={false} tickFormatter={(v) => `${v}`} />
+              <Tooltip
+                contentStyle={{ backgroundColor: '#18181b', border: '1px solid #3f3f46', borderRadius: '8px' }}
+                labelStyle={{ color: '#fafafa' }}
+                itemStyle={{ color: '#3b82f6' }}
+                formatter={(value: number) => [`${value} kWh`, 'Usage']}
+              />
+              <Area type="monotone" dataKey="kwh" stroke="#3b82f6" strokeWidth={2} fill="url(#usageGradient)" />
+            </AreaChart>
+          </ResponsiveContainer>
+        </div>
+      )}
+
+      {/* Cost Bar Chart */}
+      {billingData.length > 0 && (
+        <div className="bg-zinc-900 p-6 rounded-lg border border-zinc-800">
+          <h2 className="font-bold tracking-tight text-zinc-50 mb-6">Monthly Cost</h2>
+          <ResponsiveContainer width="100%" height={240}>
+            <BarChart data={billingData} margin={{ top: 5, right: 20, bottom: 5, left: 0 }}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#27272a" />
+              <XAxis dataKey="period" tick={{ fill: '#71717a', fontSize: 12 }} axisLine={{ stroke: '#27272a' }} tickLine={false} />
+              <YAxis tick={{ fill: '#71717a', fontSize: 12 }} axisLine={{ stroke: '#27272a' }} tickLine={false} tickFormatter={(v) => `$${v}`} />
+              <Tooltip
+                contentStyle={{ backgroundColor: '#18181b', border: '1px solid #3f3f46', borderRadius: '8px' }}
+                labelStyle={{ color: '#fafafa' }}
+                formatter={(value: number) => [`$${value.toFixed(2)}`, 'Cost']}
+              />
+              <Bar dataKey="amount" fill="#22c55e" radius={[4, 4, 0, 0]} />
+            </BarChart>
+          </ResponsiveContainer>
         </div>
       )}
 
