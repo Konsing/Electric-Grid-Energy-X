@@ -1,6 +1,7 @@
 import { PrismaClient, Role } from '@prisma/client';
 import bcrypt from 'bcryptjs';
 import { v4 as uuid } from 'uuid';
+import { calculateEnergyCost } from '@egx/shared';
 
 const prisma = new PrismaClient();
 
@@ -513,20 +514,30 @@ async function main() {
   }
 
   // ─── Billing Cycles + Payments ────────────────────
-  // Helper: create billing cycles for an account
-  async function createBillingHistory(
+  // Derives billing from actual meter readings so charts correlate
+  async function createBillingFromReadings(
     accountId: string,
     monthsBack: number,
-    avgKwh: number,
-    kwhRange: number,
-    opts?: { overdueMonth?: number; skippedPaymentMonth?: number },
+    opts?: { overdueMonth?: number },
   ) {
     for (let i = monthsBack - 1; i >= 0; i--) {
       const start = new Date(now.getFullYear(), now.getMonth() - i - 1, 1);
       const end = new Date(now.getFullYear(), now.getMonth() - i, 0);
       const due = new Date(now.getFullYear(), now.getMonth() - i + 1, 15);
-      const kwh = seasonalUsage(start.getMonth(), avgKwh, kwhRange);
-      const amount = Math.round((12.50 + kwh * 0.10) * 100) / 100;
+
+      // Sum actual readings for this account in this period
+      const agg = await prisma.meterReading.aggregate({
+        where: {
+          meter: { accountId },
+          readingDate: { gte: start, lte: end },
+        },
+        _sum: { readingValue: true },
+      });
+
+      const totalKwh = Math.round((agg._sum.readingValue || 0) * 100) / 100;
+      if (totalKwh === 0) continue; // No readings for this period
+
+      const amountDue = calculateEnergyCost(totalKwh);
 
       let status: 'PAID' | 'ISSUED' | 'OVERDUE';
       if (i === 0) {
@@ -542,20 +553,19 @@ async function main() {
           accountId,
           startDate: start,
           endDate: end,
-          totalKwh: kwh,
-          amountDue: amount,
+          totalKwh,
+          amountDue,
           status,
           dueDate: due,
         },
       });
 
-      // Create payment records for paid bills
       if (status === 'PAID') {
         const methods: Array<'CREDIT_CARD' | 'BANK_TRANSFER' | 'AUTO_PAY'> = ['CREDIT_CARD', 'BANK_TRANSFER', 'AUTO_PAY'];
         await prisma.payment.create({
           data: {
             billingCycleId: cycle.id,
-            amount,
+            amount: amountDue,
             method: methods[Math.floor(Math.random() * methods.length)],
             status: 'COMPLETED',
             idempotencyKey: uuid(),
@@ -567,25 +577,25 @@ async function main() {
   }
 
   // Jane Doe — 8 months of billing
-  await createBillingHistory(custAccount.id, 8, 450, 150);
+  await createBillingFromReadings(custAccount.id, 8);
 
   // John Smith — 6 months
-  await createBillingHistory(cust2Account.id, 6, 380, 120);
+  await createBillingFromReadings(cust2Account.id, 6);
 
   // Lisa Chen — 10 months, clean history
-  await createBillingHistory(cust3Account.id, 10, 320, 100);
+  await createBillingFromReadings(cust3Account.id, 10);
 
   // Marcus Johnson — 8 months, one overdue
-  await createBillingHistory(cust4Account.id, 8, 900, 300, { overdueMonth: 2 });
+  await createBillingFromReadings(cust4Account.id, 8, { overdueMonth: 2 });
 
   // Sarah Williams — 4 months (suspended)
-  await createBillingHistory(cust5Account.id, 4, 500, 150, { overdueMonth: 1 });
+  await createBillingFromReadings(cust5Account.id, 4, { overdueMonth: 1 });
 
   // David Kim — 6 months
-  await createBillingHistory(cust6Account.id, 6, 410, 130);
+  await createBillingFromReadings(cust6Account.id, 6);
 
   // Rachel Torres — 8 months
-  await createBillingHistory(cust7Account.id, 8, 520, 180);
+  await createBillingFromReadings(cust7Account.id, 8);
 
   // ─── Notifications ────────────────────────────────
 
