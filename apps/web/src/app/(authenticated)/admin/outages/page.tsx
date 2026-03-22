@@ -122,8 +122,11 @@ export default function AdminOutagesPage() {
         </form>
       )}
 
-      <div className="space-y-4">
-        {outages.map((outage) => (
+      {(() => {
+        const active = outages.filter((o) => o.status !== 'RESOLVED');
+        const resolved = outages.filter((o) => o.status === 'RESOLVED');
+
+        const renderCard = (outage: any) => (
           <div key={outage.id} className="bg-zinc-900 p-6 rounded-lg border border-zinc-800">
             <div className="flex justify-between items-start">
               <div>
@@ -158,8 +161,26 @@ export default function AdminOutagesPage() {
               </div>
             </div>
           </div>
-        ))}
-      </div>
+        );
+
+        return (
+          <>
+            <div className="space-y-4">
+              {active.map(renderCard)}
+              {active.length === 0 && (
+                <div className="text-center py-8 text-zinc-500">No active outages</div>
+              )}
+            </div>
+
+            {resolved.length > 0 && (
+              <div className="space-y-4">
+                <h2 className="text-lg font-semibold text-zinc-400 pt-4 border-t border-zinc-800">History</h2>
+                {resolved.map(renderCard)}
+              </div>
+            )}
+          </>
+        );
+      })()}
     </div>
   );
 }

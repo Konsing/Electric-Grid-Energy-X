@@ -139,39 +139,59 @@ export default function ManageOutagesScreen() {
         </View>
       )}
 
-      {outages.map((o: any) => (
-        <View key={o.id} style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.surfaceBorder }]}>
-          <View style={styles.cardHeader}>
-            <Text style={[styles.title, { color: colors.text }]}>{o.title}</Text>
-            <View style={[styles.badge, { backgroundColor: severityColor(o.severity) + '20' }]}>
-              <Text style={[styles.badgeText, { color: severityColor(o.severity) }]}>{o.severity}</Text>
-            </View>
-          </View>
-          <View style={styles.statusRow}>
-            <View style={[styles.statusBadge, { backgroundColor: statusColor(o.status) + '20' }]}>
-              <Text style={[styles.statusText, { color: statusColor(o.status) }]}>{o.status}</Text>
-            </View>
-          </View>
-          <Text style={[styles.area, { color: colors.textSecondary }]}>{o.affectedArea}</Text>
-          <Text style={[styles.desc, { color: colors.textMuted }]}>{o.description}</Text>
-          <Text style={[styles.time, { color: colors.textTertiary }]}>Started: {new Date(o.startedAt).toLocaleString()}</Text>
-          {o.resolvedAt && (
-            <Text style={[styles.time, { color: colors.textTertiary }]}>Resolved: {new Date(o.resolvedAt).toLocaleString()}</Text>
-          )}
+      {(() => {
+        const active = outages.filter((o: any) => o.status !== 'RESOLVED');
+        const resolved = outages.filter((o: any) => o.status === 'RESOLVED');
 
-          {o.status !== 'RESOLVED' && (
-            <TouchableOpacity
-              style={[styles.resolveBtn, { backgroundColor: colors.success + '20' }]}
-              onPress={() => handleResolve(o.id)}
-            >
-              <Text style={[styles.resolveBtnText, { color: colors.success }]}>Resolve</Text>
-            </TouchableOpacity>
-          )}
-        </View>
-      ))}
-      {outages.length === 0 && (
-        <Text style={[styles.empty, { color: colors.textTertiary }]}>No outages found</Text>
-      )}
+        const renderCard = (o: any) => (
+          <View key={o.id} style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.surfaceBorder }]}>
+            <View style={styles.cardHeader}>
+              <Text style={[styles.title, { color: colors.text }]}>{o.title}</Text>
+              <View style={[styles.badge, { backgroundColor: severityColor(o.severity) + '20' }]}>
+                <Text style={[styles.badgeText, { color: severityColor(o.severity) }]}>{o.severity}</Text>
+              </View>
+            </View>
+            <View style={styles.statusRow}>
+              <View style={[styles.statusBadge, { backgroundColor: statusColor(o.status) + '20' }]}>
+                <Text style={[styles.statusText, { color: statusColor(o.status) }]}>{o.status}</Text>
+              </View>
+            </View>
+            <Text style={[styles.area, { color: colors.textSecondary }]}>{o.affectedArea}</Text>
+            <Text style={[styles.desc, { color: colors.textMuted }]}>{o.description}</Text>
+            <Text style={[styles.time, { color: colors.textTertiary }]}>Started: {new Date(o.startedAt).toLocaleString()}</Text>
+            {o.resolvedAt && (
+              <Text style={[styles.time, { color: colors.textTertiary }]}>Resolved: {new Date(o.resolvedAt).toLocaleString()}</Text>
+            )}
+
+            {o.status !== 'RESOLVED' && (
+              <TouchableOpacity
+                style={[styles.resolveBtn, { backgroundColor: colors.success + '20' }]}
+                onPress={() => handleResolve(o.id)}
+              >
+                <Text style={[styles.resolveBtnText, { color: colors.success }]}>Resolve</Text>
+              </TouchableOpacity>
+            )}
+          </View>
+        );
+
+        return (
+          <>
+            {active.map(renderCard)}
+            {active.length === 0 && (
+              <Text style={[styles.empty, { color: colors.textTertiary }]}>No active outages</Text>
+            )}
+
+            {resolved.length > 0 && (
+              <>
+                <View style={[styles.sectionDivider, { borderTopColor: colors.surfaceBorder }]}>
+                  <Text style={[styles.sectionTitle, { color: colors.textSecondary }]}>History</Text>
+                </View>
+                {resolved.map(renderCard)}
+              </>
+            )}
+          </>
+        );
+      })()}
     </ScrollView>
   );
 }
@@ -212,5 +232,7 @@ const styles = StyleSheet.create({
   time: { fontSize: 11, marginTop: 6 },
   resolveBtn: { borderRadius: 8, paddingHorizontal: 14, paddingVertical: 8, alignSelf: 'flex-start', marginTop: 12 },
   resolveBtnText: { fontSize: 13, fontWeight: '600' },
+  sectionDivider: { borderTopWidth: 1, paddingTop: 16, marginTop: 8, marginBottom: 4 },
+  sectionTitle: { fontSize: 16, fontWeight: '600', marginBottom: 12 },
   empty: { textAlign: 'center', marginTop: 40, fontSize: 16 },
 });
