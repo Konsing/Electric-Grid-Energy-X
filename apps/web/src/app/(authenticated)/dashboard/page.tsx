@@ -49,7 +49,6 @@ export default function DashboardPage() {
 
   const billingData = [...bills]
     .reverse()
-    .slice(-8)
     .map((b: any) => ({
       period: new Date(b.startDate).toLocaleString('default', { month: 'short' }),
       amount: b.amountDue,

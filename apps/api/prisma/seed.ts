@@ -521,9 +521,9 @@ async function main() {
     opts?: { overdueMonth?: number },
   ) {
     for (let i = monthsBack - 1; i >= 0; i--) {
-      const start = new Date(now.getFullYear(), now.getMonth() - i - 1, 1);
-      const end = new Date(now.getFullYear(), now.getMonth() - i, 0);
-      const due = new Date(now.getFullYear(), now.getMonth() - i + 1, 15);
+      const start = new Date(now.getFullYear(), now.getMonth() - i, 1);
+      const end = new Date(now.getFullYear(), now.getMonth() - i + 1, 0);
+      const due = new Date(now.getFullYear(), now.getMonth() - i + 2, 15);
 
       // Sum actual readings for this account in this period
       const agg = await prisma.meterReading.aggregate({

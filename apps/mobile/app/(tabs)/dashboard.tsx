@@ -53,7 +53,7 @@ export default function DashboardScreen() {
   );
   const usageValues = months.map((m: any) => Math.round(m.kwh || 0));
 
-  const billingReversed = [...bills].reverse().slice(-6);
+  const billingReversed = [...bills].reverse();
   const costLabels = billingReversed.map((b: any) =>
     new Date(b.startDate).toLocaleString('default', { month: 'short' })
   );
