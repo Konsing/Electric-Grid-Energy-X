@@ -47,8 +47,13 @@ export default function DashboardPage() {
     cost: m.cost,
   })) || [];
 
+  // Only chart bills for months shown in the usage chart so both x-axes line up
+  const monthKey = (d: string) => new Date(d).toISOString().slice(0, 7);
+  const usageMonthKeys = new Set((analytics?.months || []).map((m: any) => monthKey(m.month)));
+
   const billingData = [...bills]
     .reverse()
+    .filter((b: any) => usageMonthKeys.has(monthKey(b.startDate)))
     .map((b: any) => ({
       period: new Date(b.startDate).toLocaleString('default', { month: 'short', timeZone: 'UTC' }),
       amount: b.amountDue,

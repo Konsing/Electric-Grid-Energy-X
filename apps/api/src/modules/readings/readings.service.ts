@@ -200,7 +200,10 @@ export async function getUsageSummary(accountId: string) {
 
 /**
  * Get usage analytics for an account: a monthly breakdown of energy
- * consumption and cost for the last 12 months.
+ * consumption and cost for the last 12 completed months.
+ *
+ * The current (in-progress) month is excluded so the timeline lines up with
+ * billing cycles, which are only issued once a month has ended.
  *
  * Returns an array of objects, each containing:
  * - month: ISO date string for the first day of that month
@@ -210,9 +213,10 @@ export async function getUsageSummary(accountId: string) {
  */
 export async function getUsageAnalytics(accountId: string) {
   const now = new Date();
+  const currentMonthStart = new Date(now.getFullYear(), now.getMonth(), 1);
   const twelveMonthsAgo = new Date(
     now.getFullYear(),
-    now.getMonth() - 11,
+    now.getMonth() - 12,
     1,
     0,
     0,
@@ -232,11 +236,11 @@ export async function getUsageAnalytics(accountId: string) {
     return { months: [] };
   }
 
-  // Fetch all readings from the last 12 months
+  // Fetch all readings from the last 12 completed months
   const readings = await prisma.meterReading.findMany({
     where: {
       meterId: { in: meterIds },
-      readingDate: { gte: twelveMonthsAgo },
+      readingDate: { gte: twelveMonthsAgo, lt: currentMonthStart },
     },
     select: {
       readingValue: true,
@@ -250,7 +254,7 @@ export async function getUsageAnalytics(accountId: string) {
 
   // Pre-populate all 12 months so we always return a full timeline
   for (let i = 0; i < 12; i++) {
-    const d = new Date(now.getFullYear(), now.getMonth() - 11 + i, 1);
+    const d = new Date(now.getFullYear(), now.getMonth() - 12 + i, 1);
     const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
     monthlyMap.set(key, 0);
   }

@@ -53,7 +53,12 @@ export default function DashboardScreen() {
   );
   const usageValues = months.map((m: any) => Math.round(m.kwh || 0));
 
-  const billingReversed = [...bills].reverse();
+  // Only chart bills for months shown in the usage chart so both x-axes line up
+  const monthKey = (d: string) => new Date(d).toISOString().slice(0, 7);
+  const usageMonthKeys = new Set(months.map((m: any) => monthKey(m.month)));
+  const billingReversed = [...bills]
+    .reverse()
+    .filter((b: any) => usageMonthKeys.has(monthKey(b.startDate)));
   const costLabels = billingReversed.map((b: any) =>
     new Date(b.startDate).toLocaleString('default', { month: 'short', timeZone: 'UTC' })
   );
