@@ -123,7 +123,7 @@ describe('Auth endpoints', () => {
         .post('/api/auth/login')
         .send({
           email: fixtures.customer.email,
-          password: 'password123',
+          password: 'password-123',
         });
 
       expect(res.status).toBe(200);
@@ -152,7 +152,7 @@ describe('Auth endpoints', () => {
         .post('/api/auth/login')
         .send({
           email: 'nobody@egx.dev',
-          password: 'password123',
+          password: 'password-123',
         });
 
       expect(res.status).toBe(401);
@@ -171,7 +171,7 @@ describe('Auth endpoints', () => {
         .post('/api/auth/login')
         .send({
           email: fixtures.customer.email,
-          password: 'password123',
+          password: 'password-123',
         });
 
       expect(res.status).toBe(401);

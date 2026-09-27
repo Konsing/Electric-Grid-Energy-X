@@ -60,6 +60,10 @@ export default function DashboardPage() {
       status: b.status,
     }));
 
+  const latestMonthLabel = usage?.latestMonth
+    ? new Date(usage.latestMonth).toLocaleString('default', { month: 'long', timeZone: 'UTC' })
+    : 'Latest Month';
+
   const trend = usage?.trend;
   const trendLabel = trend != null
     ? `${trend > 0 ? '+' : ''}${trend.toFixed(1)}%`
@@ -80,14 +84,14 @@ export default function DashboardPage() {
       {/* Stats */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         <div className="bg-zinc-900 p-6 rounded-lg border border-zinc-800">
-          <p className="text-xs uppercase tracking-wide text-zinc-500">Current Month</p>
+          <p className="text-xs uppercase tracking-wide text-zinc-500">{latestMonthLabel}</p>
           <p className="mt-1 text-3xl font-extrabold tracking-tight text-zinc-50">
             {usage?.currentMonth ? (
               <>{usage.currentMonth.toFixed(0)} <span className="text-sm text-zinc-500 font-normal">kWh</span></>
             ) : '--'}
           </p>
           {trendLabel && (
-            <p className={`text-xs mt-1 ${trendColor}`}>{trendLabel} vs last month</p>
+            <p className={`text-xs mt-1 ${trendColor}`}>{trendLabel} vs prior month</p>
           )}
         </div>
         <div className="bg-zinc-900 p-6 rounded-lg border border-zinc-800">
@@ -172,7 +176,7 @@ export default function DashboardPage() {
                   <div>
                     <p className="text-sm font-medium text-zinc-200">{formatCurrency(bill.amountDue)}</p>
                     <p className="text-xs text-zinc-500">
-                      {new Date(bill.startDate).toLocaleDateString()} - {new Date(bill.endDate).toLocaleDateString()}
+                      {new Date(bill.startDate).toLocaleDateString(undefined, { timeZone: 'UTC' })} - {new Date(bill.endDate).toLocaleDateString(undefined, { timeZone: 'UTC' })}
                     </p>
                   </div>
                   <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${

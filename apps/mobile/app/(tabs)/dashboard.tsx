@@ -41,9 +41,13 @@ export default function DashboardScreen() {
     setRefreshing(false);
   };
 
+  const latestMonthLabel = usage?.latestMonth
+    ? new Date(usage.latestMonth).toLocaleString('default', { month: 'long', timeZone: 'UTC' })
+    : 'Latest Month';
+
   const trend = usage?.trend;
   const trendLabel = trend != null
-    ? `${trend > 0 ? '+' : ''}${trend.toFixed(1)}% vs last month`
+    ? `${trend > 0 ? '+' : ''}${trend.toFixed(1)}% vs prior month`
     : null;
 
   // Chart data
@@ -98,7 +102,7 @@ export default function DashboardScreen() {
 
       <View style={styles.statsRow}>
         <View style={[styles.statCard, { backgroundColor: colors.surface, borderColor: colors.surfaceBorder }]}>
-          <Text style={[styles.statLabel, { color: colors.textSecondary }]}>Current Month</Text>
+          <Text style={[styles.statLabel, { color: colors.textSecondary }]}>{latestMonthLabel}</Text>
           <Text style={[styles.statValue, { color: colors.text }]}>
             {usage?.currentMonth ? formatKwh(usage.currentMonth) : '--'}
           </Text>

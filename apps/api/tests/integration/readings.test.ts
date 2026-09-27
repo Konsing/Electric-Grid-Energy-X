@@ -221,6 +221,23 @@ describe('Readings endpoints', () => {
       expect(res.body.data.totalKwh).toBeGreaterThan(0);
     });
 
+    it('reports the latest completed month, not the in-progress one', async () => {
+      const token = getTokenForRole('CUSTOMER');
+
+      const res = await request(app)
+        .get(`/api/accounts/${fixtures.customer.accountId}/usage/summary`)
+        .set('Authorization', `Bearer ${token}`);
+
+      // Seed readings: 500 (two months ago), 450 (last month), 400 (this month)
+      const now = new Date();
+      const lastMonthStart = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+      expect(res.body.data.latestMonth).toBe(lastMonthStart.toISOString());
+      expect(res.body.data.currentMonth).toBe(450);
+      expect(res.body.data.previousMonth).toBe(500);
+      expect(res.body.data.trend).toBe(-10);
+      expect(res.body.data.totalKwh).toBe(950);
+    });
+
     it('customer can access own summary', async () => {
       const token = getTokenForRole('CUSTOMER');
 

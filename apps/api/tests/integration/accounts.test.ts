@@ -245,7 +245,7 @@ describe('Accounts endpoints', () => {
         .post('/api/auth/login')
         .send({
           email: fixtures.customer2.email,
-          password: 'password123',
+          password: 'password-123',
         });
 
       expect(loginRes.status).toBe(401);

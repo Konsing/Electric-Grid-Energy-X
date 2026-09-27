@@ -52,10 +52,10 @@ export default function BillingScreen() {
             </View>
           </View>
           <Text style={[styles.period, { color: colors.textSecondary }]}>
-            {new Date(bill.startDate).toLocaleDateString()} – {new Date(bill.endDate).toLocaleDateString()}
+            {new Date(bill.startDate).toLocaleDateString(undefined, { timeZone: 'UTC' })} – {new Date(bill.endDate).toLocaleDateString(undefined, { timeZone: 'UTC' })}
           </Text>
           <Text style={[styles.usage, { color: colors.textSecondary }]}>{bill.totalKwh.toFixed(1)} kWh</Text>
-          <Text style={[styles.due, { color: colors.textTertiary }]}>Due: {new Date(bill.dueDate).toLocaleDateString()}</Text>
+          <Text style={[styles.due, { color: colors.textTertiary }]}>Due: {new Date(bill.dueDate).toLocaleDateString(undefined, { timeZone: 'UTC' })}</Text>
         </View>
       ))}
       {bills.length === 0 && (

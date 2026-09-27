@@ -376,6 +376,9 @@ async function main() {
   });
 
   // ─── Meter Readings ───────────────────────────────
+  // Months are offset by one (now.getMonth() - 1 - i) so seeded data covers
+  // completed months only. The in-progress month is left for the monthly
+  // simulation, which would otherwise add a second set of readings to it.
   // Seasonal pattern: higher in summer (Jun-Aug) and winter (Dec-Feb)
   function seasonalUsage(month: number, base: number, range: number): number {
     const seasonal = [1.3, 1.2, 1.0, 0.8, 0.7, 0.9, 1.4, 1.5, 1.1, 0.8, 0.9, 1.2];
@@ -393,7 +396,7 @@ async function main() {
 
   // Jane Doe main meter — 12 months, moderate usage
   for (let i = 11; i >= 0; i--) {
-    const date = new Date(now.getFullYear(), now.getMonth() - i, 1);
+    const date = new Date(now.getFullYear(), now.getMonth() - 1 - i, 1);
     readings.push({
       meterId: meter1.id,
       readingValue: seasonalUsage(date.getMonth(), 450, 150),
@@ -405,7 +408,7 @@ async function main() {
 
   // Jane Doe garage meter — 12 months, low usage
   for (let i = 11; i >= 0; i--) {
-    const date = new Date(now.getFullYear(), now.getMonth() - i, 1);
+    const date = new Date(now.getFullYear(), now.getMonth() - 1 - i, 1);
     readings.push({
       meterId: meter1b.id,
       readingValue: seasonalUsage(date.getMonth(), 80, 40),
@@ -417,7 +420,7 @@ async function main() {
 
   // John Smith — 12 months
   for (let i = 11; i >= 0; i--) {
-    const date = new Date(now.getFullYear(), now.getMonth() - i, 1);
+    const date = new Date(now.getFullYear(), now.getMonth() - 1 - i, 1);
     readings.push({
       meterId: meter2.id,
       readingValue: seasonalUsage(date.getMonth(), 380, 120),
@@ -429,7 +432,7 @@ async function main() {
 
   // Lisa Chen — 12 months, efficient household
   for (let i = 11; i >= 0; i--) {
-    const date = new Date(now.getFullYear(), now.getMonth() - i, 1);
+    const date = new Date(now.getFullYear(), now.getMonth() - 1 - i, 1);
     readings.push({
       meterId: meter3.id,
       readingValue: seasonalUsage(date.getMonth(), 320, 100),
@@ -441,7 +444,7 @@ async function main() {
 
   // Marcus Johnson — 12 months, high usage
   for (let i = 11; i >= 0; i--) {
-    const date = new Date(now.getFullYear(), now.getMonth() - i, 1);
+    const date = new Date(now.getFullYear(), now.getMonth() - 1 - i, 1);
     readings.push({
       meterId: meter4.id,
       readingValue: seasonalUsage(date.getMonth(), 900, 300),
@@ -453,7 +456,7 @@ async function main() {
 
   // Sarah Williams — only 4 months (then suspended)
   for (let i = 7; i >= 4; i--) {
-    const date = new Date(now.getFullYear(), now.getMonth() - i, 1);
+    const date = new Date(now.getFullYear(), now.getMonth() - 1 - i, 1);
     readings.push({
       meterId: meter5.id,
       readingValue: seasonalUsage(date.getMonth(), 500, 150),
@@ -465,7 +468,7 @@ async function main() {
 
   // David Kim — 12 months
   for (let i = 11; i >= 0; i--) {
-    const date = new Date(now.getFullYear(), now.getMonth() - i, 1);
+    const date = new Date(now.getFullYear(), now.getMonth() - 1 - i, 1);
     readings.push({
       meterId: meter6.id,
       readingValue: seasonalUsage(date.getMonth(), 410, 130),
@@ -477,7 +480,7 @@ async function main() {
 
   // Rachel Torres main meter — 12 months
   for (let i = 11; i >= 0; i--) {
-    const date = new Date(now.getFullYear(), now.getMonth() - i, 1);
+    const date = new Date(now.getFullYear(), now.getMonth() - 1 - i, 1);
     readings.push({
       meterId: meter7.id,
       readingValue: seasonalUsage(date.getMonth(), 520, 180),
@@ -489,7 +492,7 @@ async function main() {
 
   // Rachel Torres pool house — 8 months (pool season)
   for (let i = 7; i >= 0; i--) {
-    const date = new Date(now.getFullYear(), now.getMonth() - i, 1);
+    const date = new Date(now.getFullYear(), now.getMonth() - 1 - i, 1);
     readings.push({
       meterId: meter7b.id,
       readingValue: seasonalUsage(date.getMonth(), 150, 80),
@@ -521,15 +524,16 @@ async function main() {
     opts?: { overdueMonth?: number },
   ) {
     for (let i = monthsBack - 1; i >= 0; i--) {
-      const start = new Date(now.getFullYear(), now.getMonth() - i, 1);
-      const end = new Date(now.getFullYear(), now.getMonth() - i + 1, 0);
-      const due = new Date(now.getFullYear(), now.getMonth() - i + 2, 15);
+      const start = new Date(now.getFullYear(), now.getMonth() - 1 - i, 1);
+      const end = new Date(now.getFullYear(), now.getMonth() - i, 0);
+      const nextStart = new Date(now.getFullYear(), now.getMonth() - i, 1);
+      const due = new Date(now.getFullYear(), now.getMonth() - i + 1, 15);
 
       // Sum actual readings for this account in this period
       const agg = await prisma.meterReading.aggregate({
         where: {
           meter: { accountId },
-          readingDate: { gte: start, lte: end },
+          readingDate: { gte: start, lt: nextStart },
         },
         _sum: { readingValue: true },
       });

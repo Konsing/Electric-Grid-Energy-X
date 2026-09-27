@@ -63,7 +63,7 @@ export default function BillingPage() {
             {bills.map((bill) => (
               <tr key={bill.id} className="hover:bg-zinc-800/50">
                 <td className="px-6 py-4 text-sm text-zinc-300">
-                  {new Date(bill.startDate).toLocaleDateString()} - {new Date(bill.endDate).toLocaleDateString()}
+                  {new Date(bill.startDate).toLocaleDateString(undefined, { timeZone: 'UTC' })} - {new Date(bill.endDate).toLocaleDateString(undefined, { timeZone: 'UTC' })}
                 </td>
                 <td className="px-6 py-4 text-sm text-zinc-300">{bill.totalKwh.toFixed(1)} kWh</td>
                 <td className="px-6 py-4 text-sm font-medium text-zinc-200">{formatCurrency(bill.amountDue)}</td>
@@ -78,7 +78,7 @@ export default function BillingPage() {
                   </span>
                 </td>
                 <td className="px-6 py-4 text-sm text-zinc-400">
-                  {new Date(bill.dueDate).toLocaleDateString()}
+                  {new Date(bill.dueDate).toLocaleDateString(undefined, { timeZone: 'UTC' })}
                 </td>
                 <td className="px-6 py-4">
                   {bill.status === 'ISSUED' && (

@@ -34,7 +34,7 @@ function removeToken(): void {
     if (Platform.OS === 'web') {
       localStorage.removeItem(TOKEN_KEY);
     } else {
-      SecureStore?.deleteItem?.(TOKEN_KEY);
+      SecureStore?.deleteItemAsync(TOKEN_KEY).catch(() => {});
     }
   } catch {}
 }

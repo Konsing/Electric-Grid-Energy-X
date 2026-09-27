@@ -147,11 +147,13 @@ export async function runMonthlySimulation() {
     });
 
     if (!existingCycle) {
-      // Sum all readings for this account's meters in the billing period
+      // Sum all readings for this account's meters in the billing period.
+      // Use `lt` next month: endDate is midnight on the last day, so `lte`
+      // would miss that day's noon readings.
       const totalUsage = await prisma.meterReading.aggregate({
         where: {
           meter: { accountId: account.id },
-          readingDate: { gte: startDate, lte: endDate },
+          readingDate: { gte: startDate, lt: new Date(year, month + 1, 1) },
         },
         _sum: { readingValue: true },
       });

@@ -95,92 +95,38 @@ export async function submitReading(
 }
 
 /**
- * Get a usage summary for an account over the last 12 months.
+ * Get a usage summary for an account over the last 12 completed months.
  *
- * Aggregates readings across all meters belonging to the account and returns:
- * - totalKwh: total energy consumed in the last 12 months
+ * Derived from getUsageAnalytics so the stat cards always agree with the
+ * dashboard charts. The in-progress month is excluded because readings for
+ * it are not recorded until the month has ended.
+ *
+ * Returns:
+ * - totalKwh: total energy consumed in the last 12 completed months
  * - averageMonthly: average monthly consumption
- * - currentMonth: kWh consumed in the current calendar month
- * - previousMonth: kWh consumed in the previous calendar month
- * - trend: percentage change from previous month to current month
+ * - latestMonth: ISO date string for the first day of the latest completed month
+ * - currentMonth: kWh consumed in the latest completed month
+ * - previousMonth: kWh consumed in the month before that
+ * - trend: percentage change from previousMonth to currentMonth
  */
 export async function getUsageSummary(accountId: string) {
-  const now = new Date();
-  const twelveMonthsAgo = new Date(
-    now.getFullYear(),
-    now.getMonth() - 11,
-    1,
-    0,
-    0,
-    0,
-    0,
-  );
-  const currentMonthStart = new Date(
-    now.getFullYear(),
-    now.getMonth(),
-    1,
-    0,
-    0,
-    0,
-    0,
-  );
-  const previousMonthStart = new Date(
-    now.getFullYear(),
-    now.getMonth() - 1,
-    1,
-    0,
-    0,
-    0,
-    0,
-  );
+  const { months } = await getUsageAnalytics(accountId);
 
-  // Get all meters for this account
-  const meters = await prisma.meter.findMany({
-    where: { accountId },
-    select: { id: true },
-  });
-
-  const meterIds = meters.map((m) => m.id);
-
-  if (meterIds.length === 0) {
+  if (months.length === 0) {
     return {
       totalKwh: 0,
       averageMonthly: 0,
+      latestMonth: null,
       currentMonth: 0,
       previousMonth: 0,
       trend: 0,
     };
   }
 
-  // Total kWh over last 12 months
-  const totalResult = await prisma.meterReading.aggregate({
-    where: {
-      meterId: { in: meterIds },
-      readingDate: { gte: twelveMonthsAgo },
-    },
-    _sum: { readingValue: true },
-  });
-  const totalKwh = totalResult._sum.readingValue ?? 0;
-
-  // Current month kWh
-  const currentMonthResult = await prisma.meterReading.aggregate({
-    where: {
-      meterId: { in: meterIds },
-      readingDate: { gte: currentMonthStart },
-    },
-    _sum: { readingValue: true },
-  });
-  const currentMonth = currentMonthResult._sum.readingValue ?? 0;
-
-  // Previous month kWh
-  const previousMonthResult = await prisma.meterReading.aggregate({
-    where: {
-      meterId: { in: meterIds },
-      readingDate: { gte: previousMonthStart, lt: currentMonthStart },
-    },
-    _sum: { readingValue: true },
-  });
-  const previousMonth = previousMonthResult._sum.readingValue ?? 0;
+  const totalKwh = months.reduce((sum, m) => sum + m.kwh, 0);
+  const latest = months[months.length - 1];
+  const currentMonth = latest.kwh;
+  const previousMonth = months[months.length - 2]?.kwh ?? 0;
 
   // Calculate averages and trend
   const averageMonthly = totalKwh > 0 ? Math.round((totalKwh / 12) * 100) / 100 : 0;
@@ -192,8 +138,9 @@ export async function getUsageSummary(accountId: string) {
   return {
     totalKwh: Math.round(totalKwh * 100) / 100,
     averageMonthly,
-    currentMonth: Math.round(currentMonth * 100) / 100,
-    previousMonth: Math.round(previousMonth * 100) / 100,
+    latestMonth: latest.month,
+    currentMonth,
+    previousMonth,
     trend,
   };
 }
